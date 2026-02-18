@@ -11,13 +11,16 @@ config_version=5
 [application]
 
 config/name="Diamond mine"
-config/features=PackedStringArray("4.6", "Forward Plus")
+run/main_scene="uid://degj152hndpkq"
+config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
 
 window/size/viewport_width=640
 window/size/viewport_height=360
+window/stretch/mode="canvas_items"
+window/stretch/scale_mode="integer"
 
 [dotnet]
 
