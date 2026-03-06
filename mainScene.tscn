@@ -1,9 +1,19 @@
 [gd_scene format=3 uid="uid://degj152hndpkq"]
 
+[ext_resource type="Script" uid="uid://db2swqg82vr6t" path="res://GameManager.cs" id="1_hr5et"]
 [ext_resource type="Texture2D" uid="uid://biraejogf65w1" path="res://back.png" id="1_iwpey"]
 [ext_resource type="PackedScene" uid="uid://do31vfnbsjn74" path="res://cardScene.tscn" id="2_g4qto"]
+[ext_resource type="Texture2D" uid="uid://ba6anraaw2t0t" path="res://cardAssets/6-2.png" id="4_61od6"]
+[ext_resource type="Texture2D" uid="uid://cnft4pl653hyc" path="res://cardAssets/CardEmpty.png" id="5_6mfv6"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6mfv6"]
+load_path = "res://.godot/imported/1-2.png-60f15acc28feea10ce27f64aede91477.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_2qqqv"]
+load_path = "res://.godot/imported/2-3.png-f0d2cd7e02fac023c4accdf1438e835b.ctex"
 
 [node name="Main" type="Node2D" unique_id=835333600]
+script = ExtResource("1_hr5et")
 
 [node name="Background" type="Sprite2D" parent="." unique_id=164644663]
 z_index = -1
@@ -11,7 +21,17 @@ position = Vector2(320, 180)
 texture = ExtResource("1_iwpey")
 
 [node name="Card" parent="." unique_id=942617621 instance=ExtResource("2_g4qto")]
-position = Vector2(373, 272)
+position = Vector2(163, 296)
+texture = SubResource("CompressedTexture2D_6mfv6")
 
 [node name="Card2" parent="." unique_id=2010028547 instance=ExtResource("2_g4qto")]
-position = Vector2(168, 280)
+position = Vector2(424, 225)
+texture = SubResource("CompressedTexture2D_2qqqv")
+
+[node name="Card3" parent="Card2" unique_id=825135000 instance=ExtResource("2_g4qto")]
+position = Vector2(25, 28)
+texture = ExtResource("4_61od6")
+
+[node name="Card4" parent="." unique_id=520529082 instance=ExtResource("2_g4qto")]
+position = Vector2(268, 212)
+texture = ExtResource("5_6mfv6")

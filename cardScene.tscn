@@ -1,14 +1,13 @@
 [gd_scene format=3 uid="uid://do31vfnbsjn74"]
 
-[ext_resource type="Texture2D" uid="uid://b06wujk2dhvxv" path="res://cardAssets/1-1.png" id="1_64stc"]
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dnti4"]
+load_path = "res://.godot/imported/1-2.png-60f15acc28feea10ce27f64aede91477.ctex"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8vm5s"]
 size = Vector2(40, 60)
 
-[node name="Card" type="Node2D" unique_id=942617621]
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2110116205]
-texture = ExtResource("1_64stc")
+[node name="Card" type="Sprite2D" unique_id=520529082]
+texture = SubResource("CompressedTexture2D_dnti4")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=687081799]
 

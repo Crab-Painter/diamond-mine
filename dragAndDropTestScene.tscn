@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://bv32vtuylcmh4"]
+
+[ext_resource type="Texture2D" uid="uid://dkvjahegp63ex" path="res://cardAssets/6-1.png" id="1_m3yn6"]
+[ext_resource type="Texture2D" uid="uid://bggh5aa55sdgr" path="res://cardAssets/3-3.png" id="2_60fwk"]
+[ext_resource type="Script" uid="uid://cj1vcd3a2wnb2" path="res://Card.cs" id="2_hj8oc"]
+
+[node name="Node2D" type="Control" unique_id=1556407701]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Container2" type="TextureRect" parent="." unique_id=868262792]
+z_index = 2
+layout_mode = 0
+offset_left = 377.0
+offset_top = 149.0
+offset_right = 417.0
+offset_bottom = 189.0
+texture = ExtResource("1_m3yn6")
+script = ExtResource("2_hj8oc")
+
+[node name="Container" type="TextureRect" parent="." unique_id=1071207311]
+layout_mode = 0
+offset_left = 231.0
+offset_top = 177.0
+offset_right = 271.0
+offset_bottom = 237.0
+texture = ExtResource("2_60fwk")
+script = ExtResource("2_hj8oc")

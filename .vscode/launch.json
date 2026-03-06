@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        },
+
+        {
+        "name": "Launch Project",
+        "type": "lldb",
+        "request": "launch",
+        // Change to godot.linuxbsd.editor.dev.x86_64.llvm for llvm-based builds.
+        "program": "/home/annabelle/Godot_v4.6.1/Godot_v4.6.1-stable_mono_linux.x86_64",
+        // Change the arguments below for the project you want to test with.
+        // To run the project instead of editing it, remove the "--editor" argument.
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "preLaunchTask": "build"
+        }
+    ]
+}
