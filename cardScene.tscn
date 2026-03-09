@@ -12,6 +12,7 @@ size = Vector2(40, 60)
 z_as_relative = false
 texture = SubResource("CompressedTexture2D_dnti4")
 script = ExtResource("1_64stc")
+pathToSprite = "./"
 
 [node name="Area2D" type="Area2D" parent="." unique_id=687081799]
 

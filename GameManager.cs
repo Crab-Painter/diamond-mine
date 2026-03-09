@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 
 public partial class GameManager : Node2D
 {
+	[Export] public PackedScene CardScene {get;set;}
 	public enum GameStates
 	{
 		@default,
@@ -15,6 +16,7 @@ public partial class GameManager : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		GenerateDeck();
 		
 	}
 
@@ -80,6 +82,29 @@ public partial class GameManager : Node2D
 		{
 			state = GameStates.@default;
 			// GD.Print("released");
+		}
+	}
+
+	private void GenerateDeck()
+	{
+		int[] deckIds = new int[52];
+		for (int i=0;i<52;i++)
+		{
+			deckIds[i] = i;
+		}
+		(new Random()).Shuffle(deckIds);
+		for (int value=1;value<=13;value++)
+		{
+			for (int suit=1;suit<=4;suit++)
+			{
+				Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
+				Card card = (Card)CardScene.Instantiate();
+				card.value = value;
+				card.suit = suit;
+				card.GetSpriteNode().Texture = texture;
+
+				AddChild(card);
+			}
 		}
 	}
 }
