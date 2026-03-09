@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://do31vfnbsjn74"]
 
+[ext_resource type="Script" uid="uid://ca27rnuy1nuyw" path="res://Card.cs" id="1_64stc"]
+
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dnti4"]
 load_path = "res://.godot/imported/1-2.png-60f15acc28feea10ce27f64aede91477.ctex"
 
@@ -7,7 +9,9 @@ load_path = "res://.godot/imported/1-2.png-60f15acc28feea10ce27f64aede91477.ctex
 size = Vector2(40, 60)
 
 [node name="Card" type="Sprite2D" unique_id=520529082]
+z_as_relative = false
 texture = SubResource("CompressedTexture2D_dnti4")
+script = ExtResource("1_64stc")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=687081799]
 
