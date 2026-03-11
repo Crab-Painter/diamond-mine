@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://db2swqg82vr6t" path="res://GameManager.cs" id="1_hr5et"]
 [ext_resource type="Texture2D" uid="uid://biraejogf65w1" path="res://back.png" id="1_iwpey"]
 [ext_resource type="PackedScene" uid="uid://do31vfnbsjn74" path="res://cardScene.tscn" id="2_g4qto"]
+[ext_resource type="PackedScene" uid="uid://ulrc60xedqcg" path="res://FoundationScene.tscn" id="4_61od6"]
+[ext_resource type="PackedScene" uid="uid://bfgeu4ywwhtle" path="res://DiamondFoundationScene.tscn" id="5_6mfv6"]
 
 [node name="Main" type="Node2D" unique_id=835333600]
 script = ExtResource("1_hr5et")
@@ -13,3 +15,45 @@ z_index = -1
 z_as_relative = false
 position = Vector2(320, 180)
 texture = ExtResource("1_iwpey")
+
+[node name="Foundation1" parent="." unique_id=1027293535 instance=ExtResource("4_61od6")]
+position = Vector2(26, 138)
+
+[node name="Foundation2" parent="." unique_id=274586626 instance=ExtResource("4_61od6")]
+position = Vector2(75, 138)
+
+[node name="Foundation3" parent="." unique_id=2090025646 instance=ExtResource("4_61od6")]
+position = Vector2(124, 138)
+
+[node name="Foundation4" parent="." unique_id=1149214531 instance=ExtResource("4_61od6")]
+position = Vector2(173, 138)
+
+[node name="Foundation5" parent="." unique_id=1313745637 instance=ExtResource("4_61od6")]
+position = Vector2(222, 138)
+
+[node name="Foundation6" parent="." unique_id=1974903667 instance=ExtResource("4_61od6")]
+position = Vector2(271, 138)
+
+[node name="Foundation7" parent="." unique_id=500922360 instance=ExtResource("4_61od6")]
+position = Vector2(320, 138)
+
+[node name="Foundation8" parent="." unique_id=814129639 instance=ExtResource("4_61od6")]
+position = Vector2(369, 138)
+
+[node name="Foundation9" parent="." unique_id=1412397906 instance=ExtResource("4_61od6")]
+position = Vector2(418, 138)
+
+[node name="Foundation10" parent="." unique_id=1959195950 instance=ExtResource("4_61od6")]
+position = Vector2(467, 138)
+
+[node name="Foundation11" parent="." unique_id=1133101757 instance=ExtResource("4_61od6")]
+position = Vector2(516, 138)
+
+[node name="Foundation12" parent="." unique_id=1216167385 instance=ExtResource("4_61od6")]
+position = Vector2(565, 138)
+
+[node name="Foundation13" parent="." unique_id=887504082 instance=ExtResource("4_61od6")]
+position = Vector2(614, 138)
+
+[node name="DiamondFoundation" parent="." unique_id=790179386 instance=ExtResource("5_6mfv6")]
+position = Vector2(321, 54)

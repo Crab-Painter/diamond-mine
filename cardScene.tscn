@@ -2,19 +2,12 @@
 
 [ext_resource type="Script" uid="uid://ca27rnuy1nuyw" path="res://Card.cs" id="1_64stc"]
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dnti4"]
-load_path = "res://.godot/imported/1-2.png-60f15acc28feea10ce27f64aede91477.ctex"
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8vm5s"]
-size = Vector2(40, 60)
-
-[node name="Card" type="Sprite2D" unique_id=520529082]
+[node name="Card" type="Area2D" unique_id=1837023572]
 z_as_relative = false
-texture = SubResource("CompressedTexture2D_dnti4")
 script = ExtResource("1_64stc")
-pathToSprite = "./"
+pathToSprite = "./CardImage"
 
-[node name="Area2D" type="Area2D" parent="." unique_id=687081799]
+[node name="CardImage" type="Sprite2D" parent="." unique_id=231876022]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=803604109]
-shape = SubResource("RectangleShape2D_8vm5s")
+[node name="CollisionShape2D" type="CollisionPolygon2D" parent="." unique_id=611802520]
+polygon = PackedVector2Array(20, -26, 20, 26, 19, 26, 19, 28, 18, 28, 18, 29, 16, 29, 16, 30, -16, 30, -16, 29, -18, 29, -18, 28, -19, 28, -19, 26, -20, 26, -20, -26, -19, -26, -19, -28, -18, -28, -18, -29, -16, -29, -16, -30, 16, -30, 16, -29, 18, -29, 18, -28, 19, -28, 19, -26)

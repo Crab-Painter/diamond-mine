@@ -1,23 +1,17 @@
 using Godot;
 using System;
 
-public partial class Card : Area2D
+public partial class Foundation : Area2D
 {
-	[Export] public string pathToSprite;
-	public int value;
-	public int suit;
+	public Node2D furtestCard;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		furtestCard = this;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-	}
-
-	public Sprite2D GetSpriteNode()
-	{
-		return (Sprite2D)GetNode(pathToSprite);
 	}
 }

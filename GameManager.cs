@@ -1,8 +1,5 @@
 using Godot;
 using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-
 public partial class GameManager : Node2D
 {
 	[Export] public PackedScene CardScene {get;set;}
@@ -12,7 +9,9 @@ public partial class GameManager : Node2D
 		dragCard
 	}
 	private Node2D draggedCardNode;
+	private Node2D draggedCrardParent;
 	private GameStates state = GameStates.@default;
+	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -41,7 +40,7 @@ public partial class GameManager : Node2D
 			PhysicsPointQueryParameters2D queryParams = new();
 			queryParams.SetPosition(GetGlobalMousePosition());
 			queryParams.SetCollideWithAreas(true);
-			queryParams.SetCollisionMask(1);
+			queryParams.SetCollisionMask(1);//todo collision mask constants
 			int resultLimit = 16;
 			// as far as i understand, matches sorted in Z order. Since we need only top one, limiting number of results will improve performance
 			//TODO check this
@@ -54,33 +53,37 @@ public partial class GameManager : Node2D
 			GD.Print("Get " + matches.Count + " collisions");
 			//get the top card (highest absolute Z index)
 			CollisionObject2D collider = (CollisionObject2D)(GodotObject)matches[0]["collider"];
-			int maxZId = ((Node2D)collider.GetParent()).ZIndex;
-			GD.Print("Starting node is" + collider.GetParent().Name + ". It's index is " + maxZId);
+			int maxZId = ((Node2D)collider).ZIndex;
+			GD.Print("Starting node is" + collider.Name + ". It's index is " + maxZId);
 			foreach (Godot.Collections.Dictionary match in matches)
 			{
 				CollisionObject2D collisionNode = (CollisionObject2D)(GodotObject)match["collider"];
-				GD.Print("Checking node is" + collisionNode.GetParent().Name + ". It's index is " + ((Node2D)collisionNode.GetParent()).ZIndex);
-				if (((Node2D)collisionNode.GetParent()).ZIndex > maxZId)
+				GD.Print("Checking node is" + collisionNode.Name + ". It's index is " + ((Node2D)collisionNode).ZIndex);
+				if (((Node2D)collisionNode).ZIndex > maxZId)
 				{
 					GD.Print("new collider candidate");
-					maxZId = ((Node2D)collisionNode.GetParent()).ZIndex;
+					maxZId = ((Node2D)collisionNode).ZIndex;
 					collider = collisionNode;
 				}
 				
 			}
 
-			GD.Print("Collider node is" + collider.GetParent().Name + ". It's index is " + maxZId);
-			Node cardNode = collider.GetParent();
+			GD.Print("Collider node is" + collider.Name + ". It's index is " + maxZId);
+			Node cardNode = collider;
 			draggedCardNode = (Node2D)cardNode;//to ensure that we can move a card through script its root node should be child of or Node2D
 			//TODO when i start moving to cards i need to ensure that root node is node2d
 			state = GameStates.dragCard;
 			
 			GD.Print(cardNode.Name);
-		}
+			draggedCrardParent = cardNode.GetParent<Node2D>();
+			cardNode.Reparent(this);
+		}                  
 
 		if (@event.IsActionReleased("LMB"))
 		{
 			state = GameStates.@default;
+			draggedCardNode.Reparent(draggedCrardParent, false);
+			draggedCardNode.Position = new Vector2(0,22);
 			// GD.Print("released");
 		}
 	}
@@ -93,18 +96,35 @@ public partial class GameManager : Node2D
 			deckIds[i] = i;
 		}
 		(new Random()).Shuffle(deckIds);
-		for (int value=1;value<=13;value++)
-		{
-			for (int suit=1;suit<=4;suit++)
-			{
-				Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
-				Card card = (Card)CardScene.Instantiate();
-				card.value = value;
-				card.suit = suit;
-				card.GetSpriteNode().Texture = texture;
 
-				AddChild(card);
+		int foundationId = 1;
+		int zId = 1;
+		foreach (int i in deckIds)
+		{
+			int value = i%13+1;
+			int suit = i/13+1;
+			
+
+			Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
+			Card card = (Card)CardScene.Instantiate();
+			card.value = value;
+			card.suit = suit;
+			card.Name = "Card";
+			card.GetSpriteNode().Texture = texture;
+			card.ZIndex = zId;
+
+			Foundation foundation = GetNode<Foundation>("Foundation"+foundationId);
+			foundation.furtestCard.AddChild(card);
+			foundation.furtestCard = card;
+			card.Position = new Vector2(0,22);
+
+			foundationId++;
+			if (foundationId > 13)
+			{
+				foundationId -= 13;
+				zId++;
 			}
 		}
+				
 	}
 }
