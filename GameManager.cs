@@ -10,12 +10,14 @@ public partial class GameManager : Node2D
 	}
 	private Node2D draggedCardNode;
 	private Node2D draggedCrardParent;
+	private Vector2 relativeDragPosition;
+	private int cardZId;
 	private GameStates state = GameStates.@default;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		GenerateDeck();
+		GameRules.GenerateDeck(this, CardScene);
 		
 	}
 
@@ -28,7 +30,7 @@ public partial class GameManager : Node2D
 			draggedCardNode.Position = new Vector2(
 				float.Clamp(mousePosition.X, 0, GetViewportRect().Size.X),//looks like this might cause productivity drop?
 				float.Clamp(mousePosition.Y, 0, GetViewportRect().Size.Y)
-			);
+			) + relativeDragPosition;
 		}
 	}
 
@@ -43,7 +45,8 @@ public partial class GameManager : Node2D
 		{
 			state = GameStates.@default;
 			draggedCardNode.Reparent(draggedCrardParent, false);
-			draggedCardNode.Position = new Vector2(0,22);
+			draggedCardNode.Position = new Vector2(0,draggedCrardParent is Card ? 22f : 0f);
+			draggedCardNode.ZIndex = cardZId;
 			// GD.Print("released");
 		}
 	}
@@ -75,48 +78,13 @@ public partial class GameManager : Node2D
 			}
 		}
 
-		draggedCardNode = cardNode;
 		state = GameStates.dragCard;
+		draggedCardNode = cardNode;
 		draggedCrardParent = cardNode.GetParent<Node2D>();
 		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
+		relativeDragPosition = cardNode.GlobalPosition - GetGlobalMousePosition();
+		cardZId = cardNode.ZIndex;
+		cardNode.ZIndex = 100;
 	}
 
-	private void GenerateDeck()
-	{
-		int[] deckIds = new int[52];
-		for (int i=0;i<52;i++)
-		{
-			deckIds[i] = i;
-		}
-		(new Random()).Shuffle(deckIds);
-
-		int foundationId = 1;
-		int zId = 1;
-		foreach (int i in deckIds)
-		{
-			int value = i%13+1;
-			int suit = i/13+1;
-			
-			Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
-			Card card = (Card)CardScene.Instantiate();
-			card.value = value;
-			card.suit = suit;
-			card.Name = "Card";
-			card.GetSpriteNode().Texture = texture;
-			card.ZIndex = zId;
-
-			Foundation foundation = GetNode<Foundation>("Foundation"+foundationId);
-			foundation.furtestCard.AddChild(card);
-			foundation.furtestCard = card;
-			card.Position = new Vector2(0,22);
-
-			foundationId++;
-			if (foundationId > 13)
-			{
-				foundationId -= 13;
-				zId++;
-			}
-		}
-				
-	}
 }
