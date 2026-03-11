@@ -3,6 +3,12 @@ using System;
 
 public partial class Card : Area2D
 {
+	/*
+	expected scene structure:
+	Area2D
+	--CollisionShape2D
+	--Sprite2D
+	*/
 	[Export] public string pathToSprite;
 	public int value;
 	public int suit;

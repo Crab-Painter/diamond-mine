@@ -36,47 +36,7 @@ public partial class GameManager : Node2D
 	{
 		if (@event.IsActionPressed("LMB"))
 		{
-			var spaceState = GetWorld2D().DirectSpaceState;
-			PhysicsPointQueryParameters2D queryParams = new();
-			queryParams.SetPosition(GetGlobalMousePosition());
-			queryParams.SetCollideWithAreas(true);
-			queryParams.SetCollisionMask(1);//todo collision mask constants
-			int resultLimit = 16;
-			// as far as i understand, matches sorted in Z order. Since we need only top one, limiting number of results will improve performance
-			//TODO check this
-    		var matches = spaceState.IntersectPoint(queryParams,resultLimit);
-			if (matches.Count == 0)
-			{
-				return;
-			}
-
-			GD.Print("Get " + matches.Count + " collisions");
-			//get the top card (highest absolute Z index)
-			CollisionObject2D collider = (CollisionObject2D)(GodotObject)matches[0]["collider"];
-			int maxZId = ((Node2D)collider).ZIndex;
-			GD.Print("Starting node is" + collider.Name + ". It's index is " + maxZId);
-			foreach (Godot.Collections.Dictionary match in matches)
-			{
-				CollisionObject2D collisionNode = (CollisionObject2D)(GodotObject)match["collider"];
-				GD.Print("Checking node is" + collisionNode.Name + ". It's index is " + ((Node2D)collisionNode).ZIndex);
-				if (((Node2D)collisionNode).ZIndex > maxZId)
-				{
-					GD.Print("new collider candidate");
-					maxZId = ((Node2D)collisionNode).ZIndex;
-					collider = collisionNode;
-				}
-				
-			}
-
-			GD.Print("Collider node is" + collider.Name + ". It's index is " + maxZId);
-			Node cardNode = collider;
-			draggedCardNode = (Node2D)cardNode;//to ensure that we can move a card through script its root node should be child of or Node2D
-			//TODO when i start moving to cards i need to ensure that root node is node2d
-			state = GameStates.dragCard;
-			
-			GD.Print(cardNode.Name);
-			draggedCrardParent = cardNode.GetParent<Node2D>();
-			cardNode.Reparent(this);
+			DetectTopCard();
 		}                  
 
 		if (@event.IsActionReleased("LMB"))
@@ -86,6 +46,39 @@ public partial class GameManager : Node2D
 			draggedCardNode.Position = new Vector2(0,22);
 			// GD.Print("released");
 		}
+	}
+
+	private void DetectTopCard()
+	{
+		//check which areas2D associated with cards are in the point on mouse cursor
+		var spaceState = GetWorld2D().DirectSpaceState;
+		PhysicsPointQueryParameters2D queryParams = new();
+		queryParams.SetPosition(GetGlobalMousePosition());
+		queryParams.SetCollideWithAreas(true);
+		queryParams.SetCollisionMask(1);//todo collision mask constants
+		var matches = spaceState.IntersectPoint(queryParams);
+		if (matches.Count == 0)
+		{
+			return;
+		}
+
+		//get the top card (highest absolute Z index)
+		Node2D cardNode = (Node2D)(GodotObject)matches[0]["collider"];
+		int maxZId = cardNode.ZIndex;
+		foreach (Godot.Collections.Dictionary match in matches)
+		{
+			Node2D collisionNode = (Node2D)(GodotObject)match["collider"];
+			if (collisionNode.ZIndex > maxZId)
+			{
+				maxZId = collisionNode.ZIndex;
+				cardNode = collisionNode;
+			}
+		}
+
+		draggedCardNode = cardNode;
+		state = GameStates.dragCard;
+		draggedCrardParent = cardNode.GetParent<Node2D>();
+		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
 	}
 
 	private void GenerateDeck()
@@ -104,7 +97,6 @@ public partial class GameManager : Node2D
 			int value = i%13+1;
 			int suit = i/13+1;
 			
-
 			Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
 			Card card = (Card)CardScene.Instantiate();
 			card.value = value;
