@@ -26,4 +26,14 @@ public partial class Card : Area2D
 	{
 		return (Sprite2D)GetNode(pathToSprite);
 	}
+
+	public void SetZIndexRecursive(int zId)
+	{
+		ZIndex = zId;
+		if (HasNode("./Card"))
+		{
+			Card childCard = GetNode<Card>("./Card");
+			childCard.SetZIndexRecursive(zId+1);
+		}
+	}
 }

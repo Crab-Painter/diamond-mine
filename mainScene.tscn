@@ -9,6 +9,7 @@
 [node name="Main" type="Node2D" unique_id=835333600]
 script = ExtResource("1_hr5et")
 CardScene = ExtResource("2_g4qto")
+DragedCardZIndex = 100
 
 [node name="Background" type="Sprite2D" parent="." unique_id=164644663]
 z_index = -1

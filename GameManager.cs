@@ -3,15 +3,14 @@ using System;
 public partial class GameManager : Node2D
 {
 	[Export] public PackedScene CardScene {get;set;}
+	[Export] public int DragedCardZIndex {get;set;}
 	public enum GameStates
 	{
 		@default,
 		dragCard
 	}
-	private Node2D draggedCardNode;
-	private Node2D draggedCrardParent;
-	private Vector2 relativeDragPosition;
-	private int cardZId;
+
+	private DraggedCardData draggedCardData;
 	private GameStates state = GameStates.@default;
 	
 	// Called when the node enters the scene tree for the first time.
@@ -27,10 +26,11 @@ public partial class GameManager : Node2D
 		if (state == GameStates.dragCard)
 		{
 			Vector2 mousePosition = GetGlobalMousePosition();
+			Card draggedCardNode = draggedCardData.CardNode;
 			draggedCardNode.Position = new Vector2(
 				float.Clamp(mousePosition.X, 0, GetViewportRect().Size.X),//looks like this might cause productivity drop?
 				float.Clamp(mousePosition.Y, 0, GetViewportRect().Size.Y)
-			) + relativeDragPosition;
+			) + draggedCardData.RelativeDragVector;
 		}
 	}
 
@@ -44,10 +44,10 @@ public partial class GameManager : Node2D
 		if (@event.IsActionReleased("LMB"))
 		{
 			state = GameStates.@default;
-			draggedCardNode.Reparent(draggedCrardParent, false);
-			draggedCardNode.Position = new Vector2(0,draggedCrardParent is Card ? 22f : 0f);
-			draggedCardNode.ZIndex = cardZId;
-			// GD.Print("released");
+			Card draggedCardNode = draggedCardData.CardNode;
+			draggedCardNode.Reparent(draggedCardData.CrardParentNode, false);
+			draggedCardNode.Position = new Vector2(0,draggedCardData.CrardParentNode is Card ? 22f : 0f);
+			draggedCardNode.SetZIndexRecursive(draggedCardData.CardZIndexGlobal);
 		}
 	}
 
@@ -66,11 +66,11 @@ public partial class GameManager : Node2D
 		}
 
 		//get the top card (highest absolute Z index)
-		Node2D cardNode = (Node2D)(GodotObject)matches[0]["collider"];
+		Card cardNode = (Card)(GodotObject)matches[0]["collider"];
 		int maxZId = cardNode.ZIndex;
 		foreach (Godot.Collections.Dictionary match in matches)
 		{
-			Node2D collisionNode = (Node2D)(GodotObject)match["collider"];
+			Card collisionNode = (Card)(GodotObject)match["collider"];
 			if (collisionNode.ZIndex > maxZId)
 			{
 				maxZId = collisionNode.ZIndex;
@@ -78,13 +78,15 @@ public partial class GameManager : Node2D
 			}
 		}
 
+		draggedCardData = new(
+			cardNode,
+			cardNode.GetParent<Node2D>(),
+			cardNode.GlobalPosition - GetGlobalMousePosition(),
+			cardNode.ZIndex
+		);
 		state = GameStates.dragCard;
-		draggedCardNode = cardNode;
-		draggedCrardParent = cardNode.GetParent<Node2D>();
 		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
-		relativeDragPosition = cardNode.GlobalPosition - GetGlobalMousePosition();
-		cardZId = cardNode.ZIndex;
-		cardNode.ZIndex = 100;
+		cardNode.SetZIndexRecursive(DragedCardZIndex);
 	}
 
 }
