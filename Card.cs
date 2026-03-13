@@ -36,4 +36,15 @@ public partial class Card : Area2D
 			childCard.SetZIndexRecursive(zId+1);
 		}
 	}
+
+	public void FlipFaceUp()
+	{
+		Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
+		GetSpriteNode().Texture = texture;
+		CollisionLayer = GameRules.COLLISION_LAYER_DRAGGABLE;
+		if (suit != (int)GameRules.Suits.diamonds)
+		{
+			CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
+		}
+	}
 }

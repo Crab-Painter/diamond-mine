@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c6xsytapv5ljw" path="res://Foundation.cs" id="1_u81h4"]
 
 [node name="Node2D" type="Area2D" unique_id=1027293535]
-collision_layer = 4
+collision_layer = 2
 script = ExtResource("1_u81h4")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1325266849]

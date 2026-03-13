@@ -2,7 +2,7 @@ using Godot;
 
 public class DraggedCardData(
     Card cardNode,
-    Node2D cardParentNode,
+    Area2D cardParentNode,
     Vector2 relativeDragVector,
     int cardZIndexGlobal
     )
@@ -16,8 +16,8 @@ public class DraggedCardData(
         }
     }
 
-	private readonly Node2D _cardParentNode = cardParentNode;
-    public Node2D CrardParentNode
+	private readonly Area2D _cardParentNode = cardParentNode;
+    public Area2D CrardParentNode
     {
         get
         {

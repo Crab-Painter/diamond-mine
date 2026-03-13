@@ -85,7 +85,7 @@ public partial class GameManager : Node2D
 		//change gamestate
 		draggedCardData = new(
 			cardNode,
-			cardNode.GetParent<Node2D>(),
+			cardNode.GetParent<Area2D>(),
 			cardNode.GlobalPosition - GetGlobalMousePosition(),
 			cardNode.ZIndex
 		);
@@ -127,5 +127,17 @@ public partial class GameManager : Node2D
 		draggedCardNode.Reparent(dropPoint, false);
 		draggedCardNode.Position = new Vector2(0,dropPoint is Card ? 22f : 0f);
 		draggedCardNode.SetZIndexRecursive(dropPoint.ZIndex+1);
+
+		dropPoint.CollisionLayer -= GameRules.COLLISION_LAYER_DROPPABLE;
+
+		Area2D parent = draggedCardData.CrardParentNode;
+		if (parent is Card card)
+		{
+			card.FlipFaceUp();
+		}
+		else
+		{
+			parent.CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
+		}
 	}
 }
