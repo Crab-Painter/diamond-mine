@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Data;
 public partial class GameManager : Node2D
 {
 	[Export] public PackedScene CardScene {get;set;}
@@ -44,10 +45,13 @@ public partial class GameManager : Node2D
 		if (@event.IsActionReleased("LMB"))
 		{
 			state = GameStates.@default;
-			Card draggedCardNode = draggedCardData.CardNode;
-			draggedCardNode.Reparent(draggedCardData.CrardParentNode, false);
-			draggedCardNode.Position = new Vector2(0,draggedCardData.CrardParentNode is Card ? 22f : 0f);
-			draggedCardNode.SetZIndexRecursive(draggedCardData.CardZIndexGlobal);
+			if (!CanDropHere())
+			{
+				Card draggedCardNode = draggedCardData.CardNode;
+				draggedCardNode.Reparent(draggedCardData.CrardParentNode, false);
+				draggedCardNode.Position = new Vector2(0,draggedCardData.CrardParentNode is Card ? 22f : 0f);
+				draggedCardNode.SetZIndexRecursive(draggedCardData.CardZIndexGlobal);
+			}
 		}
 	}
 
@@ -58,8 +62,8 @@ public partial class GameManager : Node2D
 		PhysicsPointQueryParameters2D queryParams = new();
 		queryParams.SetPosition(GetGlobalMousePosition());
 		queryParams.SetCollideWithAreas(true);
-		queryParams.SetCollisionMask(1);//todo collision mask constants
-		var matches = spaceState.IntersectPoint(queryParams);
+		queryParams.SetCollisionMask(GameRules.COLLISION_LAYER_DRAGGABLE);
+		Godot.Collections.Array<Godot.Collections.Dictionary> matches = spaceState.IntersectPoint(queryParams);
 		if (matches.Count == 0)
 		{
 			return;
@@ -78,6 +82,7 @@ public partial class GameManager : Node2D
 			}
 		}
 
+		//change gamestate
 		draggedCardData = new(
 			cardNode,
 			cardNode.GetParent<Node2D>(),
@@ -89,4 +94,38 @@ public partial class GameManager : Node2D
 		cardNode.SetZIndexRecursive(DragedCardZIndex);
 	}
 
+	private bool CanDropHere()
+	{
+		var spaceState = GetWorld2D().DirectSpaceState;
+		PhysicsPointQueryParameters2D queryParams = new();
+		queryParams.SetPosition(GetGlobalMousePosition());
+		queryParams.SetCollideWithAreas(true);
+		queryParams.SetCollisionMask(GameRules.GetDropMaskForCard(draggedCardData.CardNode));
+		queryParams.SetExclude([draggedCardData.CardNode.GetRid()]);
+		var matches = spaceState.IntersectPoint(queryParams);
+		if (matches.Count == 0)
+		{
+			return false;
+		} else if (matches.Count != 1)
+		{
+			throw new DataException("wrong number of droppable items. Need to check collision layers management");
+		}
+
+		Area2D dropPoint = (Area2D)(GodotObject)matches[0]["collider"];
+		if (dropPoint is Card card && !GameRules.CanDrop(draggedCardData.CardNode, card))
+		{
+			return false;
+		}
+
+		DropHere(dropPoint);
+		return true;
+	}
+	
+	private void DropHere(Area2D dropPoint)
+	{
+		Card draggedCardNode = draggedCardData.CardNode;
+		draggedCardNode.Reparent(dropPoint, false);
+		draggedCardNode.Position = new Vector2(0,dropPoint is Card ? 22f : 0f);
+		draggedCardNode.SetZIndexRecursive(dropPoint.ZIndex+1);
+	}
 }
