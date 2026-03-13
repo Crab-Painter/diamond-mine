@@ -10,10 +10,10 @@ public static class GameRules
 
 	public enum Suits
 	{
-		diamonds,
-		hearts,
-		clubs,
-		spades
+		diamonds = 1,
+		hearts = 2,
+		clubs = 3,
+		spades = 4
 	}
 
     public static void GenerateDeck(Node2D rootNode, PackedScene cardScene)
