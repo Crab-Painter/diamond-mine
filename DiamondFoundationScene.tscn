@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bfgeu4ywwhtle"]
 
 [node name="Node2D" type="Area2D" unique_id=1027293535]
-collision_layer = 8
+collision_layer = 4
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1325266849]
 polygon = PackedVector2Array(20, -26, 20, 26, 19, 26, 19, 28, 18, 28, 18, 29, 16, 29, 16, 30, -16, 30, -16, 29, -18, 29, -18, 28, -19, 28, -19, 26, -20, 26, -20, -26, -19, -26, -19, -28, -18, -28, -18, -29, -16, -29, -16, -30, 16, -30, 16, -29, 18, -29, 18, -28, 19, -28, 19, -26)

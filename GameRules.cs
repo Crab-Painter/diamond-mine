@@ -6,7 +6,6 @@ public static class GameRules
 	public const uint COLLISION_LAYER_DRAGGABLE = 1;
 	public const uint COLLISION_LAYER_NON_DRAGGABLE = 2;
 	public const uint COLLISION_LAYER_DROPPABLE = 4;
-	public const uint COLLISION_LAYER_DROPPABLE_DIAMONDS = 8;
 
 	public enum Suits
 	{
@@ -67,27 +66,29 @@ public static class GameRules
 		}		
 	}
 
-	public static uint GetDropMaskForCard(Card draggedCard)
+	public static bool CanDrop(Card draggedCard, Area2D nodeToDropOn)
 	{
-		if (draggedCard.IsDiamonds())
+		GD.Print("start canDrop");
+		if (nodeToDropOn is Card cardToDropOn)
 		{
-			return COLLISION_LAYER_DROPPABLE_DIAMONDS;
+			GD.Print("is Card");
+			int valueDelta = cardToDropOn.value - draggedCard.value;
+			if (draggedCard.IsDiamonds())
+			{
+				return valueDelta == -1 || valueDelta == 12;
+			}
+			else
+			{
+				return valueDelta == 1;
+			}
 		}
 
-		return COLLISION_LAYER_DROPPABLE;
-		
-	}
-
-	public static bool CanDrop(Card draggedCard, Card cardToDropOn)
-	{
-		int valueDelta = cardToDropOn.value - draggedCard.value;
+		GD.Print("is Foundation");
 		if (draggedCard.IsDiamonds())
 		{
-			return valueDelta == -1 || valueDelta == 12;
+			GD.Print("is diamond foundation");
+			return nodeToDropOn.Name == "DiamondFoundation";
 		}
-		else
-		{
-			return valueDelta == 1;
-		}
+		return true;
 	}
 }
