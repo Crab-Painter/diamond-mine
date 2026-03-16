@@ -16,7 +16,7 @@ public static class GameRules
 		spades = 4
 	}
 
-    public static void GenerateDeck(Node2D rootNode, PackedScene cardScene)
+    public static void GenerateDeck(GameManager rootNode, PackedScene cardScene)
 	{
 		int[] deckIds = new int[52];
 		for (int i=0;i<52;i++)
@@ -55,7 +55,7 @@ public static class GameRules
 
 			Foundation foundation = rootNode.GetNode<Foundation>("Foundation"+foundationId);
 			foundation.furtestCard.AddChild(card);
-			card.Position = new Vector2(0,foundation.furtestCard is Card ? 22f : 0f);
+			card.Position = new Vector2(0,foundation.furtestCard is Card ? rootNode.CardStackingTransform : 0f);
 			foundation.furtestCard = card;
 
 			foundationId++;
@@ -69,7 +69,7 @@ public static class GameRules
 
 	public static uint GetDropMaskForCard(Card draggedCard)
 	{
-		if (draggedCard.suit == (int)Suits.diamonds)
+		if (draggedCard.IsDiamonds())
 		{
 			return COLLISION_LAYER_DROPPABLE_DIAMONDS;
 		}
@@ -80,6 +80,14 @@ public static class GameRules
 
 	public static bool CanDrop(Card draggedCard, Card cardToDropOn)
 	{
-		return (cardToDropOn.value - draggedCard.value) == 1;
+		int valueDelta = cardToDropOn.value - draggedCard.value;
+		if (draggedCard.IsDiamonds())
+		{
+			return valueDelta == -1 || valueDelta == 12;
+		}
+		else
+		{
+			return valueDelta == 1;
+		}
 	}
 }

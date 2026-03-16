@@ -5,6 +5,8 @@ public partial class GameManager : Node2D
 {
 	[Export] public PackedScene CardScene {get;set;}
 	[Export] public int DragedCardZIndex {get;set;}
+	[Export] public float CardStackingTransform {get;set;}
+
 	public enum GameStates
 	{
 		@default,
@@ -44,12 +46,16 @@ public partial class GameManager : Node2D
 
 		if (@event.IsActionReleased("LMB"))
 		{
+			if (state != GameStates.dragCard)
+			{
+				return;
+			}
 			state = GameStates.@default;
 			if (!CanDropHere())
 			{
 				Card draggedCardNode = draggedCardData.CardNode;
 				draggedCardNode.Reparent(draggedCardData.CrardParentNode, false);
-				draggedCardNode.Position = new Vector2(0,draggedCardData.CrardParentNode is Card ? 22f : 0f);
+				draggedCardNode.Position = new Vector2(0,draggedCardData.CrardParentNode is Card ? CardStackingTransform : 0f);
 				draggedCardNode.SetZIndexRecursive(draggedCardData.CardZIndexGlobal);
 			}
 		}
@@ -123,13 +129,16 @@ public partial class GameManager : Node2D
 	
 	private void DropHere(Area2D dropPoint)
 	{
+		//Visuals and parenting
 		Card draggedCardNode = draggedCardData.CardNode;
 		draggedCardNode.Reparent(dropPoint, false);
-		draggedCardNode.Position = new Vector2(0,dropPoint is Card ? 22f : 0f);
+		draggedCardNode.Position = new Vector2(0,GetPositionYAfterDrop(dropPoint));
 		draggedCardNode.SetZIndexRecursive(dropPoint.ZIndex+1);
 
+		//drop point processing
 		dropPoint.CollisionLayer -= GameRules.COLLISION_LAYER_DROPPABLE;
 
+		//previous place processing
 		Area2D parent = draggedCardData.CrardParentNode;
 		if (parent is Card card)
 		{
@@ -139,5 +148,22 @@ public partial class GameManager : Node2D
 		{
 			parent.CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
 		}
+		
+		//card processing
+		if (draggedCardNode.IsDiamonds())
+		{
+			draggedCardNode.CollisionLayer = GameRules.COLLISION_LAYER_NON_DRAGGABLE + GameRules.COLLISION_LAYER_DROPPABLE_DIAMONDS;
+		}
+
+		//game rules(win, lose, points ect) processing
 	}
+
+	private float GetPositionYAfterDrop(Area2D dropPoint)
+	{
+        if ((dropPoint is Card dropCard) && !dropCard.IsDiamonds())
+        {
+            return CardStackingTransform;
+        }
+		return 0f;
+    }
 }

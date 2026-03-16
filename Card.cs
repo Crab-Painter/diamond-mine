@@ -42,9 +42,14 @@ public partial class Card : Area2D
 		Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
 		GetSpriteNode().Texture = texture;
 		CollisionLayer = GameRules.COLLISION_LAYER_DRAGGABLE;
-		if (suit != (int)GameRules.Suits.diamonds)
+		if (!IsDiamonds())
 		{
 			CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
 		}
+	}
+
+	public bool IsDiamonds()
+	{
+		return suit == (int)GameRules.Suits.diamonds;
 	}
 }
