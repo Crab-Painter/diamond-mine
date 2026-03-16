@@ -6,8 +6,6 @@ public partial class GameManager : Node2D
 	[Export] public PackedScene CardScene {get;set;}
 	[Export] public int DragedCardZIndex {get;set;}
 	[Export] public float CardStackingTransform {get;set;}
-	[Export] public string DiamondFoundationName {get;set;}
-
 	public enum GameStates
 	{
 		@default,

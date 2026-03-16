@@ -68,10 +68,8 @@ public static class GameRules
 
 	public static bool CanDrop(Card draggedCard, Area2D nodeToDropOn)
 	{
-		GD.Print("start canDrop");
 		if (nodeToDropOn is Card cardToDropOn)
 		{
-			GD.Print("is Card");
 			int valueDelta = cardToDropOn.value - draggedCard.value;
 			if (draggedCard.IsDiamonds())
 			{
@@ -83,10 +81,8 @@ public static class GameRules
 			}
 		}
 
-		GD.Print("is Foundation");
 		if (draggedCard.IsDiamonds())
 		{
-			GD.Print("is diamond foundation");
 			return nodeToDropOn.Name == "DiamondFoundation";
 		}
 		return true;
