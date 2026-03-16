@@ -6,7 +6,6 @@ public partial class GameManager : Node2D
 	[Export] public PackedScene CardScene {get;set;}
 	[Export] public int DragedCardZIndex {get;set;}
 	[Export] public float CardStackingTransform {get;set;}
-
 	public enum GameStates
 	{
 		@default,
@@ -106,7 +105,7 @@ public partial class GameManager : Node2D
 		PhysicsPointQueryParameters2D queryParams = new();
 		queryParams.SetPosition(GetGlobalMousePosition());
 		queryParams.SetCollideWithAreas(true);
-		queryParams.SetCollisionMask(GameRules.GetDropMaskForCard(draggedCardData.CardNode));
+		queryParams.SetCollisionMask(GameRules.COLLISION_LAYER_DROPPABLE);
 		queryParams.SetExclude([draggedCardData.CardNode.GetRid()]);
 		var matches = spaceState.IntersectPoint(queryParams);
 		if (matches.Count == 0)
@@ -118,7 +117,7 @@ public partial class GameManager : Node2D
 		}
 
 		Area2D dropPoint = (Area2D)(GodotObject)matches[0]["collider"];
-		if (dropPoint is Card card && !GameRules.CanDrop(draggedCardData.CardNode, card))
+		if (!GameRules.CanDrop(draggedCardData.CardNode, dropPoint))
 		{
 			return false;
 		}
@@ -152,7 +151,7 @@ public partial class GameManager : Node2D
 		//card processing
 		if (draggedCardNode.IsDiamonds())
 		{
-			draggedCardNode.CollisionLayer = GameRules.COLLISION_LAYER_NON_DRAGGABLE + GameRules.COLLISION_LAYER_DROPPABLE_DIAMONDS;
+			draggedCardNode.CollisionLayer = GameRules.COLLISION_LAYER_NON_DRAGGABLE + GameRules.COLLISION_LAYER_DROPPABLE;
 		}
 
 		//game rules(win, lose, points ect) processing
