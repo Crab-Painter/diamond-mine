@@ -4,7 +4,8 @@ public class DraggedCardData(
     Card cardNode,
     Area2D cardParentNode,
     Vector2 relativeDragVector,
-    int cardZIndexGlobal
+    int cardZIndexGlobal,
+    bool wasParentClosed
     )
 {
     private readonly Card _cardNode = cardNode;
@@ -40,6 +41,15 @@ public class DraggedCardData(
         get
         {
             return _cardZIndexGlobal;
+        }
+    }
+
+    private readonly bool _wasParentClosed = wasParentClosed;
+    public bool WasParentClosed
+    {
+        get
+        {
+            return _wasParentClosed;
         }
     }
 }

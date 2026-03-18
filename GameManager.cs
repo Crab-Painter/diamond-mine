@@ -90,11 +90,13 @@ public partial class GameManager : Node2D
 		}
 
 		//change gamestate
+		bool wasParentClosed = cardNode.HasPreviousCard() && cardNode.GetPreviousCard().isClosed;
 		draggedCardData = new(
 			cardNode,
 			cardNode.GetParent<Area2D>(),
 			cardNode.GlobalPosition - GetGlobalMousePosition(),
-			cardNode.ZIndex
+			cardNode.ZIndex,
+			wasParentClosed
 		);
 		isCardDragged = true;
 		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
@@ -122,7 +124,9 @@ public partial class GameManager : Node2D
 				names += ((Node2D)(GodotObject)match["collider"]).Name;
 				names += ", ";
 			}
-			throw new DataException("wrong number of droppable items. Need to check collision layers management. Nodes are: " + names);
+			GD.Print("double drob bug");
+			return false;
+			// throw new DataException("wrong number of droppable items. Need to check collision layers management. Nodes are: " + names);
 		}
 
 		Area2D dropPoint = (Area2D)(GodotObject)matches[0]["collider"];
@@ -189,7 +193,10 @@ public partial class GameManager : Node2D
 		
 		if (parent is Card card)
 		{
-			card.FlipFaceDown();
+			if (draggedCardDataLocal.WasParentClosed)
+			{
+				card.FlipFaceDown();
+			}
 		}
 		else
 		{

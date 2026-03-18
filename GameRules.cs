@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public static class GameRules
 {
@@ -14,6 +15,13 @@ public static class GameRules
 		clubs = 3,
 		spades = 4
 	}
+
+	private static Dictionary<int,bool> collectedFullSuits = new()
+	{
+		{(int)Suits.hearts, false},
+		{(int)Suits.clubs, false},
+		{(int)Suits.spades, false}
+	};
 
     public static void GenerateDeck(GameManager rootNode, PackedScene cardScene)
 	{
@@ -46,8 +54,11 @@ public static class GameRules
 				{
 					card.CollisionLayer += COLLISION_LAYER_DROPPABLE;                
 				}
-			} else
+				card.isClosed = false;
+			}
+			else
 			{
+				card.isClosed = true;
 				card.CollisionLayer = COLLISION_LAYER_NON_DRAGGABLE;
 			}
 			
@@ -95,10 +106,45 @@ public static class GameRules
 		{
 			return draggedCard.value;
 		}
-		else
+
+		//check full suit pile
+		if (collectedFullSuits[draggedCard.suit])
 		{
-			//check full
+			return 0;
 		}
-		return 0;
+		// going up the tree
+		Card cardPointer = draggedCard;
+		while(cardPointer.HasPreviousCard())
+		{
+			Card previousCard = cardPointer.GetPreviousCard();
+			if (previousCard.suit != cardPointer.suit || (previousCard.value - cardPointer.value != 1))
+			{
+				return 0;
+			}
+			cardPointer = previousCard;
+		}
+		if (cardPointer.value != 13)
+		{
+			return 0;
+		}
+
+		//going dowh the tree
+		cardPointer = draggedCard;
+		while(cardPointer.HasNextCard())
+		{
+			Card nexrCard = cardPointer.GetNextCard();
+			if (nexrCard.suit != cardPointer.suit || (cardPointer.value - nexrCard.value != 1))
+			{
+				return 0;
+			}
+			cardPointer = nexrCard;
+		}
+		if (cardPointer.value != 1)
+		{
+			return 0;
+		}
+
+		collectedFullSuits[draggedCard.suit] = true;
+		return 3;
 	}
 }
