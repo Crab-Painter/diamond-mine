@@ -48,6 +48,13 @@ public partial class Card : Area2D
 		}
 	}
 
+	public void FlipFaceDown()
+	{
+		Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/CardBack.png");
+		GetSpriteNode().Texture = texture;
+		CollisionLayer = GameRules.COLLISION_LAYER_NON_DRAGGABLE;
+	}
+
 	public bool IsDiamonds()
 	{
 		return suit == (int)GameRules.Suits.diamonds;

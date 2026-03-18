@@ -87,4 +87,18 @@ public static class GameRules
 		}
 		return true;
 	}
+
+	//Updates point with assumption that card drag-n-drop was successfull
+	public static int CalculatePointsChange(Card draggedCard)
+	{
+		if (draggedCard.IsDiamonds())
+		{
+			return draggedCard.value;
+		}
+		else
+		{
+			//check full
+		}
+		return 0;
+	}
 }

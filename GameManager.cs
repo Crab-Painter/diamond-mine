@@ -6,26 +6,28 @@ public partial class GameManager : Node2D
 	[Export] public PackedScene CardScene {get;set;}
 	[Export] public int DragedCardZIndex {get;set;}
 	[Export] public float CardStackingTransform {get;set;}
-	public enum GameStates
-	{
-		@default,
-		dragCard
-	}
+	[Export] public PointsCounter PointsCounter {get;set;}
+	[Export] public string DragActionName {get;set;}
+	[Export] public Button UndoButton {get;set;}
+	[Export] public Button RedoButton {get;set;}
 
 	private DraggedCardData draggedCardData;
-	private GameStates state = GameStates.@default;
+	private bool isCardDragged = false;
+	private int points = 0;
+	private UndoRedo undoRedo = new();
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		RedoButton.Pressed += Redo;
+		UndoButton.Pressed += Undo;
 		GameRules.GenerateDeck(this, CardScene);
-		
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (state == GameStates.dragCard)
+		if (isCardDragged)
 		{
 			Vector2 mousePosition = GetGlobalMousePosition();
 			Card draggedCardNode = draggedCardData.CardNode;
@@ -38,19 +40,19 @@ public partial class GameManager : Node2D
 
 	public override void _Input(InputEvent @event)
 	{
-		if (@event.IsActionPressed("LMB"))
+		if (@event.IsActionPressed(DragActionName))
 		{
 			DetectTopCard();
 		}                  
 
-		if (@event.IsActionReleased("LMB"))
+		if (@event.IsActionReleased(DragActionName))
 		{
-			if (state != GameStates.dragCard)
+			if (!isCardDragged)
 			{
 				return;
 			}
-			state = GameStates.@default;
-			if (!CanDropHere())
+			isCardDragged = false;
+			if (!TryDropHere())
 			{
 				Card draggedCardNode = draggedCardData.CardNode;
 				draggedCardNode.Reparent(draggedCardData.CrardParentNode, false);
@@ -94,12 +96,12 @@ public partial class GameManager : Node2D
 			cardNode.GlobalPosition - GetGlobalMousePosition(),
 			cardNode.ZIndex
 		);
-		state = GameStates.dragCard;
+		isCardDragged = true;
 		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
 		cardNode.SetZIndexRecursive(DragedCardZIndex);
 	}
 
-	private bool CanDropHere()
+	private bool TryDropHere()
 	{
 		var spaceState = GetWorld2D().DirectSpaceState;
 		PhysicsPointQueryParameters2D queryParams = new();
@@ -113,7 +115,14 @@ public partial class GameManager : Node2D
 			return false;
 		} else if (matches.Count != 1)
 		{
-			throw new DataException("wrong number of droppable items. Need to check collision layers management");
+			string names = "";
+			foreach (var match in matches)
+			{
+
+				names += ((Node2D)(GodotObject)match["collider"]).Name;
+				names += ", ";
+			}
+			throw new DataException("wrong number of droppable items. Need to check collision layers management. Nodes are: " + names);
 		}
 
 		Area2D dropPoint = (Area2D)(GodotObject)matches[0]["collider"];
@@ -122,14 +131,19 @@ public partial class GameManager : Node2D
 			return false;
 		}
 
-		DropHere(dropPoint);
+
+		DraggedCardData draggedCardDataLocal = draggedCardData;
+		undoRedo.CreateAction("drag card");
+		undoRedo.AddDoMethod(Callable.From(() => DropHere(dropPoint, draggedCardDataLocal)));
+		undoRedo.AddUndoMethod(Callable.From(() => ReverseDropHere(dropPoint, draggedCardDataLocal)));
+		undoRedo.CommitAction();
 		return true;
 	}
 	
-	private void DropHere(Area2D dropPoint)
+	private void DropHere(Area2D dropPoint, DraggedCardData draggedCardDataLocal)
 	{
 		//Visuals and parenting
-		Card draggedCardNode = draggedCardData.CardNode;
+		Card draggedCardNode = draggedCardDataLocal.CardNode;
 		draggedCardNode.Reparent(dropPoint, false);
 		draggedCardNode.Position = new Vector2(0,GetPositionYAfterDrop(dropPoint));
 		draggedCardNode.SetZIndexRecursive(dropPoint.ZIndex+1);
@@ -138,7 +152,7 @@ public partial class GameManager : Node2D
 		dropPoint.CollisionLayer -= GameRules.COLLISION_LAYER_DROPPABLE;
 
 		//previous place processing
-		Area2D parent = draggedCardData.CrardParentNode;
+		Area2D parent = draggedCardDataLocal.CrardParentNode;
 		if (parent is Card card)
 		{
 			card.FlipFaceUp();
@@ -155,6 +169,42 @@ public partial class GameManager : Node2D
 		}
 
 		//game rules(win, lose, points ect) processing
+		points += GameRules.CalculatePointsChange(draggedCardNode);
+		PointsCounter.UpdatePoints(points);
+	}
+
+	private void ReverseDropHere(Area2D dropPoint, DraggedCardData draggedCardDataLocal)
+	{
+		//Visuals and parenting
+		Card draggedCardNode = draggedCardDataLocal.CardNode;
+		Area2D parent = draggedCardDataLocal.CrardParentNode;
+		draggedCardNode.Reparent(parent, false);
+		draggedCardNode.Position = new Vector2(0,parent is Card ? CardStackingTransform : 0f);
+		draggedCardNode.SetZIndexRecursive(draggedCardDataLocal.CardZIndexGlobal);
+
+		//drop point processing
+		dropPoint.CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
+
+		//previous place processing
+		
+		if (parent is Card card)
+		{
+			card.FlipFaceDown();
+		}
+		else
+		{
+			parent.CollisionLayer -= GameRules.COLLISION_LAYER_DROPPABLE;
+		}
+		
+		//card processing
+		if (draggedCardNode.IsDiamonds())
+		{
+			draggedCardNode.CollisionLayer = GameRules.COLLISION_LAYER_DRAGGABLE;
+		}
+
+		//game rules(win, lose, points ect) processing
+		points -= GameRules.CalculatePointsChange(draggedCardNode);
+		PointsCounter.UpdatePoints(points);
 	}
 
 	private float GetPositionYAfterDrop(Area2D dropPoint)
@@ -165,4 +215,14 @@ public partial class GameManager : Node2D
         }
 		return 0f;
     }
+
+	public void Undo()
+	{
+		undoRedo.Undo();
+	}
+
+	public void Redo()
+	{
+		undoRedo.Redo();
+	}
 }
