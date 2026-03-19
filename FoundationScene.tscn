@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://ulrc60xedqcg"]
 
 [ext_resource type="Script" uid="uid://c6xsytapv5ljw" path="res://Foundation.cs" id="1_u81h4"]
+[ext_resource type="PackedScene" uid="uid://dv6cf8p3p804w" path="res://CollisionPolygonScene.tscn" id="2_0fthl"]
 
 [node name="Node2D" type="Area2D" unique_id=1027293535]
-collision_layer = 2
+collision_layer = 0
 script = ExtResource("1_u81h4")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1325266849]
-polygon = PackedVector2Array(20, -26, 20, 26, 19, 26, 19, 28, 18, 28, 18, 29, 16, 29, 16, 30, -16, 30, -16, 29, -18, 29, -18, 28, -19, 28, -19, 26, -20, 26, -20, -26, -19, -26, -19, -28, -18, -28, -18, -29, -16, -29, -16, -30, 16, -30, 16, -29, 18, -29, 18, -28, 19, -28, 19, -26)
+[node name="CollisionPolygon" parent="." unique_id=1160436566 instance=ExtResource("2_0fthl")]

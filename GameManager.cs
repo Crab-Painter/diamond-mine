@@ -4,37 +4,77 @@ using System.Data;
 public partial class GameManager : Node2D
 {
 	[Export] public PackedScene CardScene {get;set;}
+	[Export] public UI UserInterface {get;set;}
 	[Export] public int DragedCardZIndex {get;set;}
 	[Export] public float CardStackingTransform {get;set;}
-	[Export] public PointsCounter PointsCounter {get;set;}
 	[Export] public string DragActionName {get;set;}
-	[Export] public Button UndoButton {get;set;}
-	[Export] public Button RedoButton {get;set;}
+	[Export] public string DebugProbeActionName {get;set;}
+	[Export] public string UndoActionName {get;set;}
+	[Export] public string RedoActionName {get;set;}
+	[Export] public string NewGameActionName {get;set;}
+
+
+
 
 	private DraggedCardData draggedCardData;
-	private bool isCardDragged = false;
-	private int points = 0;
+	private enum States
+	{
+		idle,
+		cardDragged,
+		newGame,
+		win,
+		lose
+	}
+	private States state = States.newGame;
+	private int _points = 0;
+	public int Points
+	{
+		get
+		{
+			return _points;
+		}
+		set
+		{
+			_points = value;	
+			UserInterface.PointsCounter.UpdatePoints(Points);
+		}
+	}
 	private UndoRedo undoRedo = new();
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		RedoButton.Pressed += Redo;
-		UndoButton.Pressed += Undo;
-		GameRules.GenerateDeck(this, CardScene);
+		UserInterface.RedoButton.Pressed += Redo;
+		UserInterface.UndoButton.Pressed += Undo;
+		UserInterface.NewGameButton.Pressed += StartNewGame;	
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (isCardDragged)
+		switch(state)
 		{
-			Vector2 mousePosition = GetGlobalMousePosition();
-			Card draggedCardNode = draggedCardData.CardNode;
-			draggedCardNode.Position = new Vector2(
-				float.Clamp(mousePosition.X, 0, GetViewportRect().Size.X),//looks like this might cause productivity drop?
-				float.Clamp(mousePosition.Y, 0, GetViewportRect().Size.Y)
-			) + draggedCardData.RelativeDragVector;
+			//switch to state pattern? doesn't seems like super heavy and complicated yet
+			case States.idle:
+				return;
+			case States.newGame:
+				GameRules.GenerateDeck(this, CardScene);
+				state = States.idle;
+				break;
+			case States.win:
+				UserInterface.PlayerMessage.Text = "You win!";//todo make preatier
+				break;
+			case States.lose:
+				//show "no possible moves" msg
+				break;
+			case States.cardDragged:
+				Vector2 mousePosition = GetGlobalMousePosition();
+				Card draggedCardNode = draggedCardData.CardNode;
+				draggedCardNode.Position = new Vector2(
+					float.Clamp(mousePosition.X, 0, GetViewportRect().Size.X),//looks like this might cause productivity drop?
+					float.Clamp(mousePosition.Y, 0, GetViewportRect().Size.Y)
+				) + draggedCardData.RelativeDragVector;
+				break;
 		}
 	}
 
@@ -47,11 +87,11 @@ public partial class GameManager : Node2D
 
 		if (@event.IsActionReleased(DragActionName))
 		{
-			if (!isCardDragged)
+			if (state != States.cardDragged)
 			{
 				return;
 			}
-			isCardDragged = false;
+			state = States.idle;
 			if (!TryDropHere())
 			{
 				Card draggedCardNode = draggedCardData.CardNode;
@@ -59,6 +99,26 @@ public partial class GameManager : Node2D
 				draggedCardNode.Position = new Vector2(0,draggedCardData.CrardParentNode is Card ? CardStackingTransform : 0f);
 				draggedCardNode.SetZIndexRecursive(draggedCardData.CardZIndexGlobal);
 			}
+		}
+
+		if (@event.IsActionPressed(DebugProbeActionName))
+		{
+			GetDebugInfoAtCursor();
+		}
+
+		if (@event.IsActionPressed(UndoActionName))
+		{
+			Undo();
+		}
+
+		if (@event.IsActionPressed(RedoActionName))
+		{
+			Redo();
+		}
+
+		if (@event.IsActionPressed(NewGameActionName))
+		{
+			StartNewGame();
 		}
 	}
 
@@ -98,7 +158,7 @@ public partial class GameManager : Node2D
 			cardNode.ZIndex,
 			wasParentClosed
 		);
-		isCardDragged = true;
+		state = States.cardDragged;
 		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
 		cardNode.SetZIndexRecursive(DragedCardZIndex);
 	}
@@ -115,16 +175,25 @@ public partial class GameManager : Node2D
 		if (matches.Count == 0)
 		{
 			return false;
-		} else if (matches.Count != 1)
+		}
+		else if (matches.Count != 1)
 		{
 			string names = "";
 			foreach (var match in matches)
 			{
-
 				names += ((Node2D)(GodotObject)match["collider"]).Name;
 				names += ", ";
 			}
-			GD.Print("double drob bug");
+			if (names == "Card, Card, ")
+			{
+				names = "";
+				foreach (var match in matches)
+				{
+					names += ((Card)(GodotObject)match["collider"]).ToString();
+					names += ", ";
+				}
+			}
+			GD.Print("double drop bug. Nodes are " + names);
 			return false;
 			// throw new DataException("wrong number of droppable items. Need to check collision layers management. Nodes are: " + names);
 		}
@@ -157,24 +226,25 @@ public partial class GameManager : Node2D
 
 		//previous place processing
 		Area2D parent = draggedCardDataLocal.CrardParentNode;
-		if (parent is Card card)
+		parent.CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
+		if (parent is Card card && card.isClosed)
 		{
 			card.FlipFaceUp();
 		}
-		else
-		{
-			parent.CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
-		}
+
 		
 		//card processing
 		if (draggedCardNode.IsDiamonds())
 		{
-			draggedCardNode.CollisionLayer = GameRules.COLLISION_LAYER_NON_DRAGGABLE + GameRules.COLLISION_LAYER_DROPPABLE;
+			draggedCardNode.CollisionLayer = GameRules.COLLISION_LAYER_DROPPABLE;
 		}
 
 		//game rules(win, lose, points ect) processing
-		points += GameRules.CalculatePointsChange(draggedCardNode);
-		PointsCounter.UpdatePoints(points);
+		Points += GameRules.CalculatePointsChange(draggedCardNode);
+		if (GameRules.IsWin(Points))
+		{
+			state = States.win;
+		}
 	}
 
 	private void ReverseDropHere(Area2D dropPoint, DraggedCardData draggedCardDataLocal)
@@ -210,8 +280,7 @@ public partial class GameManager : Node2D
 		}
 
 		//game rules(win, lose, points ect) processing
-		points -= GameRules.CalculatePointsChange(draggedCardNode);
-		PointsCounter.UpdatePoints(points);
+		Points -= GameRules.CalculatePointsChange(draggedCardNode);
 	}
 
 	private float GetPositionYAfterDrop(Area2D dropPoint)
@@ -231,5 +300,55 @@ public partial class GameManager : Node2D
 	public void Redo()
 	{
 		undoRedo.Redo();
+	}
+
+	private void StartNewGame()
+	{
+		GameRules.ClearBoardFromCards(this);
+		Points = 0;
+		undoRedo = new();
+		state = States.newGame;
+	}
+
+
+	private void GetDebugInfoAtCursor()
+	{
+		//check which areas2D associated with cards are in the point on mouse cursor
+		var spaceState = GetWorld2D().DirectSpaceState;
+		PhysicsPointQueryParameters2D queryParams = new();
+		queryParams.SetPosition(GetGlobalMousePosition());
+		queryParams.SetCollideWithAreas(true);
+		// queryParams.SetCollisionMask(GameRules.COLLISION_LAYER_DRAGGABLE);
+		Godot.Collections.Array<Godot.Collections.Dictionary> matches = spaceState.IntersectPoint(queryParams);
+		if (matches.Count == 0)
+		{
+			GD.Print("No collision founded");
+			return;
+		}
+
+		Card cardNode;
+		//get the top card (highest absolute Z index)
+		try
+		{
+			cardNode = (Card)(GodotObject)matches[0]["collider"];
+		}
+		catch
+		{
+			GD.Print("not a card");
+			return;
+		}
+		
+		int maxZId = cardNode.ZIndex;
+		foreach (Godot.Collections.Dictionary match in matches)
+		{
+			Card collisionNode = (Card)(GodotObject)match["collider"];
+			if (collisionNode.ZIndex > maxZId)
+			{
+				maxZId = collisionNode.ZIndex;
+				cardNode = collisionNode;
+			}
+		}
+
+		GD.Print(cardNode.ToString());
 	}
 }

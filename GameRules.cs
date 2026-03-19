@@ -5,8 +5,7 @@ using System.Collections.Generic;
 public static class GameRules
 {
 	public const uint COLLISION_LAYER_DRAGGABLE = 1;
-	public const uint COLLISION_LAYER_NON_DRAGGABLE = 2;
-	public const uint COLLISION_LAYER_DROPPABLE = 4;
+	public const uint COLLISION_LAYER_DROPPABLE = 2;
 
 	public enum Suits
 	{
@@ -47,19 +46,17 @@ public static class GameRules
 			card.Name = "Card";
 			card.GetSpriteNode().Texture = texture;
 			card.ZIndex = zId;
+			card.isClosed = true;
+			card.CollisionLayer = 0;
+
 			if (zId == 4)
 			{
-				card.CollisionLayer = COLLISION_LAYER_DRAGGABLE;
+				card.CollisionLayer += COLLISION_LAYER_DRAGGABLE;
 				if (suit != (int)Suits.diamonds)
 				{
 					card.CollisionLayer += COLLISION_LAYER_DROPPABLE;                
 				}
 				card.isClosed = false;
-			}
-			else
-			{
-				card.isClosed = true;
-				card.CollisionLayer = COLLISION_LAYER_NON_DRAGGABLE;
 			}
 			
 
@@ -75,6 +72,34 @@ public static class GameRules
 				zId++;
 			}
 		}		
+	}
+
+	public static void ClearBoardFromCards(GameManager rootNode)
+	{
+		for (int i=1;i<=13;i++)
+		{
+			Foundation foundation = rootNode.GetNode<Foundation>("Foundation"+i);
+			var children = foundation.GetChildren();
+			foreach (Node child in children)
+			{
+				if (child.Name == "Card")
+				{
+					child.QueueFree();
+				}
+			}
+			foundation.furtestCard = foundation;
+			foundation.CollisionLayer = 0;
+		}
+		Area2D diamondFoundation = rootNode.GetNode<Area2D>("DiamondFoundation");
+		var diamondChildren = diamondFoundation.GetChildren();
+		foreach (Node child in diamondChildren)
+		{
+			if (child.Name == "Card")
+			{
+				child.QueueFree();
+			}
+		}
+		diamondFoundation.CollisionLayer = COLLISION_LAYER_DROPPABLE;
 	}
 
 	public static bool CanDrop(Card draggedCard, Area2D nodeToDropOn)
@@ -146,5 +171,10 @@ public static class GameRules
 
 		collectedFullSuits[draggedCard.suit] = true;
 		return 3;
+	}
+
+	public static bool IsWin(int pointsAmount)
+	{
+		return pointsAmount == 100;
 	}
 }

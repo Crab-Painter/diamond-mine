@@ -13,6 +13,17 @@ public partial class Card : Area2D
 	public int value;
 	public int suit;
 	public bool isClosed;
+
+
+    public override string ToString()
+    {
+		string result = Name + " " + value.ToString() + " of " + ((GameRules.Suits)suit).ToString() + ". ";
+		result += "Collision layer is " + CollisionLayer.ToString() + ". ";
+		result += "The card is " + (isClosed ? "closed" : "open");
+        return base.ToString() + result;
+    }
+
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -40,6 +51,11 @@ public partial class Card : Area2D
 
 	public void FlipFaceUp()
 	{
+		if (!isClosed)
+		{
+			return;
+		}
+
 		Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
 		GetSpriteNode().Texture = texture;
 		CollisionLayer = GameRules.COLLISION_LAYER_DRAGGABLE;
@@ -52,9 +68,14 @@ public partial class Card : Area2D
 
 	public void FlipFaceDown()
 	{
+		if (isClosed)
+		{
+			return;
+		}
+
 		Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/CardBack.png");
 		GetSpriteNode().Texture = texture;
-		CollisionLayer = GameRules.COLLISION_LAYER_NON_DRAGGABLE;
+		CollisionLayer = 0;
 		isClosed = true;
 	}
 

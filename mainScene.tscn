@@ -3,57 +3,80 @@
 [ext_resource type="Script" uid="uid://db2swqg82vr6t" path="res://GameManager.cs" id="1_hr5et"]
 [ext_resource type="Texture2D" uid="uid://biraejogf65w1" path="res://back.png" id="1_iwpey"]
 [ext_resource type="PackedScene" uid="uid://do31vfnbsjn74" path="res://cardScene.tscn" id="2_g4qto"]
+[ext_resource type="Script" uid="uid://c4ya7efl8jf1t" path="res://UI.cs" id="3_vuu3o"]
 [ext_resource type="Script" uid="uid://5nnl01qu7dk7" path="res://PointsCounter.cs" id="4_2qqqv"]
 [ext_resource type="PackedScene" uid="uid://ulrc60xedqcg" path="res://FoundationScene.tscn" id="4_61od6"]
 [ext_resource type="PackedScene" uid="uid://bfgeu4ywwhtle" path="res://DiamondFoundationScene.tscn" id="5_6mfv6"]
 [ext_resource type="Texture2D" uid="uid://8pbwrmhnk6yy" path="res://undoIcon.png" id="5_bnlnp"]
 [ext_resource type="Texture2D" uid="uid://g6dkrbwsc2ud" path="res://redoIcon.png" id="6_vuu3o"]
 
-[node name="Main" type="Node2D" unique_id=835333600 node_paths=PackedStringArray("PointsCounter", "UndoButton", "RedoButton")]
+[node name="Main" type="Node2D" unique_id=835333600 node_paths=PackedStringArray("UserInterface")]
 script = ExtResource("1_hr5et")
 CardScene = ExtResource("2_g4qto")
+UserInterface = NodePath("UI")
 DragedCardZIndex = 100
-CardStackingTransform = 21.0
-PointsCounter = NodePath("Background/PointsCounter")
+CardStackingTransform = 19.0
 DragActionName = "LMB"
-UndoButton = NodePath("Background/ButtonsContainer/Undo")
-RedoButton = NodePath("Background/ButtonsContainer/Redo")
+DebugProbeActionName = "Debug"
+UndoActionName = "Undo"
+RedoActionName = "Redo"
+NewGameActionName = "New Game"
+
+[node name="UI" type="Control" parent="." unique_id=1466179020 node_paths=PackedStringArray("PointsCounter", "UndoButton", "RedoButton", "NewGameButton", "PlayerMessage")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 640.0
+offset_bottom = 360.0
+script = ExtResource("3_vuu3o")
+PointsCounter = NodePath("PointsCounter")
+UndoButton = NodePath("VBoxContainer/ButtonsContainer/Undo")
+RedoButton = NodePath("VBoxContainer/ButtonsContainer/Redo")
+NewGameButton = NodePath("VBoxContainer/ButtonsContainer/NewGame")
+PlayerMessage = NodePath("VBoxContainer/Message")
+
+[node name="PointsCounter" type="Label" parent="UI" unique_id=1950220817]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -129.0
+offset_bottom = 26.0
+grow_horizontal = 0
+script = ExtResource("4_2qqqv")
+BaseText = "Points: "
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI" unique_id=924964629]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="UI/VBoxContainer" unique_id=1779258191]
+layout_mode = 2
+
+[node name="Undo" type="Button" parent="UI/VBoxContainer/ButtonsContainer" unique_id=898314714]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+icon = ExtResource("5_bnlnp")
+expand_icon = true
+
+[node name="Redo" type="Button" parent="UI/VBoxContainer/ButtonsContainer" unique_id=556596645]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+icon = ExtResource("6_vuu3o")
+expand_icon = true
+
+[node name="NewGame" type="Button" parent="UI/VBoxContainer/ButtonsContainer" unique_id=1808848094]
+layout_mode = 2
+text = "New Game"
+
+[node name="Message" type="Label" parent="UI/VBoxContainer" unique_id=1799710264]
+layout_mode = 2
 
 [node name="Background" type="Sprite2D" parent="." unique_id=164644663]
 z_index = -1
 z_as_relative = false
 position = Vector2(320, 180)
 texture = ExtResource("1_iwpey")
-
-[node name="PointsCounter" type="Label" parent="Background" unique_id=1950220817]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -449.0
-offset_top = -180.0
-offset_right = -320.0
-offset_bottom = -154.0
-grow_horizontal = 0
-script = ExtResource("4_2qqqv")
-BaseText = "Points: "
-
-[node name="ButtonsContainer" type="HBoxContainer" parent="Background" unique_id=1779258191]
-offset_left = -320.0
-offset_top = -180.0
-offset_right = -280.0
-offset_bottom = -140.0
-
-[node name="Undo" type="Button" parent="Background/ButtonsContainer" unique_id=898314714]
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-icon = ExtResource("5_bnlnp")
-expand_icon = true
-
-[node name="Redo" type="Button" parent="Background/ButtonsContainer" unique_id=556596645]
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-icon = ExtResource("6_vuu3o")
-expand_icon = true
 
 [node name="Foundation1" parent="." unique_id=1027293535 instance=ExtResource("4_61od6")]
 position = Vector2(26, 138)
