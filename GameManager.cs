@@ -261,17 +261,16 @@ public partial class GameManager : Node2D
 
 		//previous place processing
 		
-		if (parent is Card card)
+		////////////////////////////////////////
+		if (parent is Card card && draggedCardDataLocal.WasParentClosed)
 		{
-			if (draggedCardDataLocal.WasParentClosed)
-			{
-				card.FlipFaceDown();
-			}
+			card.FlipFaceDown();
 		}
 		else
 		{
 			parent.CollisionLayer -= GameRules.COLLISION_LAYER_DROPPABLE;
 		}
+		//////////////////////////////////////////
 		
 		//card processing
 		if (draggedCardNode.IsDiamonds())

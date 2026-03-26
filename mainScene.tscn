@@ -28,49 +28,52 @@ anchors_preset = 0
 offset_right = 640.0
 offset_bottom = 360.0
 script = ExtResource("3_vuu3o")
-PointsCounter = NodePath("PointsCounter")
-UndoButton = NodePath("VBoxContainer/ButtonsContainer/Undo")
-RedoButton = NodePath("VBoxContainer/ButtonsContainer/Redo")
-NewGameButton = NodePath("VBoxContainer/ButtonsContainer/NewGame")
-PlayerMessage = NodePath("VBoxContainer/Message")
+PointsCounter = NodePath("Statistics container/PointsCounter")
+UndoButton = NodePath("Controls container/ButtonsContainer/Undo")
+RedoButton = NodePath("Controls container/ButtonsContainer/Redo")
+NewGameButton = NodePath("Controls container/ButtonsContainer/NewGame")
+PlayerMessage = NodePath("Controls container/Message")
 
-[node name="PointsCounter" type="Label" parent="UI" unique_id=1950220817]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -129.0
-offset_bottom = 26.0
-grow_horizontal = 0
-script = ExtResource("4_2qqqv")
-BaseText = "Points: "
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI" unique_id=924964629]
+[node name="Controls container" type="VBoxContainer" parent="UI" unique_id=924964629]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="ButtonsContainer" type="HBoxContainer" parent="UI/VBoxContainer" unique_id=1779258191]
+[node name="ButtonsContainer" type="HBoxContainer" parent="UI/Controls container" unique_id=1779258191]
 layout_mode = 2
 
-[node name="Undo" type="Button" parent="UI/VBoxContainer/ButtonsContainer" unique_id=898314714]
+[node name="Undo" type="Button" parent="UI/Controls container/ButtonsContainer" unique_id=898314714]
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 icon = ExtResource("5_bnlnp")
 expand_icon = true
 
-[node name="Redo" type="Button" parent="UI/VBoxContainer/ButtonsContainer" unique_id=556596645]
+[node name="Redo" type="Button" parent="UI/Controls container/ButtonsContainer" unique_id=556596645]
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 icon = ExtResource("6_vuu3o")
 expand_icon = true
 
-[node name="NewGame" type="Button" parent="UI/VBoxContainer/ButtonsContainer" unique_id=1808848094]
+[node name="NewGame" type="Button" parent="UI/Controls container/ButtonsContainer" unique_id=1808848094]
 layout_mode = 2
 text = "New Game"
 
-[node name="Message" type="Label" parent="UI/VBoxContainer" unique_id=1799710264]
+[node name="Message" type="Label" parent="UI/Controls container" unique_id=1799710264]
 layout_mode = 2
+
+[node name="Statistics container" type="HBoxContainer" parent="UI" unique_id=2108926298]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_bottom = 40.0
+grow_horizontal = 0
+
+[node name="PointsCounter" type="Label" parent="UI/Statistics container" unique_id=1950220817]
+layout_mode = 2
+script = ExtResource("4_2qqqv")
+BaseText = "Points: "
 
 [node name="Background" type="Sprite2D" parent="." unique_id=164644663]
 z_index = -1
