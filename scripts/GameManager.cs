@@ -12,6 +12,9 @@ public partial class GameManager : Node2D
 	[Export] public string UndoActionName {get;set;}
 	[Export] public string RedoActionName {get;set;}
 	[Export] public string NewGameActionName {get;set;}
+	[Export] public Foundation DiamondFoundation {get;set;}
+	[Export] public Timer DoubleClickTimer {get;set;}
+
 
 
 
@@ -83,6 +86,11 @@ public partial class GameManager : Node2D
 	{
 		if (@event.IsActionPressed(DragActionName))
 		{
+			if (IsDoubleClick())
+			{
+				AutoDiamond();
+				return;
+			}
 			DetectTopCard();
 		}                  
 
@@ -223,6 +231,19 @@ public partial class GameManager : Node2D
 
 		//drop point processing
 		dropPoint.CollisionLayer -= GameRules.COLLISION_LAYER_DROPPABLE;
+		if (dropPoint.Name == "DiamondFoundation")
+		{
+			DiamondFoundation.furtestCard = draggedCardNode;
+		}
+		else if (dropPoint.Name == "Card")
+		{
+			Card dropPointCard = (Card)dropPoint;
+			if (dropPointCard.IsDiamonds())
+			{
+				DiamondFoundation.furtestCard = draggedCardNode;
+			} 
+		}
+
 
 		//previous place processing
 		Area2D parent = draggedCardDataLocal.CrardParentNode;
@@ -258,6 +279,18 @@ public partial class GameManager : Node2D
 
 		//drop point processing
 		dropPoint.CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
+		if (dropPoint.Name == "DiamondFoundation")
+		{
+			DiamondFoundation.furtestCard = dropPoint;
+		}
+		else if (dropPoint.Name == "Card")
+		{
+			Card dropPointCard = (Card)dropPoint;
+			if (dropPointCard.IsDiamonds())
+			{
+				DiamondFoundation.furtestCard = dropPoint;
+			} 
+		}
 
 		//previous place processing
 		
@@ -350,4 +383,68 @@ public partial class GameManager : Node2D
 
 		GD.Print(cardNode.ToString());
 	}
+
+	private bool IsDoubleClick()
+	{
+		if (!DoubleClickTimer.IsStopped())
+		{
+			DoubleClickTimer.Stop();
+			return true;
+		}
+		DoubleClickTimer.Start();
+		return false;
+		
+	}
+	private void AutoDiamond()
+	{
+		GD.Print("double click registered");
+		//check which areas2D associated with cards are in the point on mouse cursor
+		var spaceState = GetWorld2D().DirectSpaceState;
+		PhysicsPointQueryParameters2D queryParams = new();
+		queryParams.SetPosition(GetGlobalMousePosition());
+		queryParams.SetCollideWithAreas(true);
+		queryParams.SetCollisionMask(GameRules.COLLISION_LAYER_DRAGGABLE);
+		Godot.Collections.Array<Godot.Collections.Dictionary> matches = spaceState.IntersectPoint(queryParams);
+		if (matches.Count == 0)
+		{
+			return;
+		}
+
+		//get the top card (highest absolute Z index)
+		Card cardNode = (Card)(GodotObject)matches[0]["collider"];
+		int maxZId = cardNode.ZIndex;
+		foreach (Godot.Collections.Dictionary match in matches)
+		{
+			Card collisionNode = (Card)(GodotObject)match["collider"];
+			if (collisionNode.ZIndex > maxZId)
+			{
+				maxZId = collisionNode.ZIndex;
+				cardNode = collisionNode;
+			}
+		}
+		
+		if (!cardNode.IsDiamonds())
+		{
+			return;
+		}
+
+		if (GameRules.CanDrop(cardNode, DiamondFoundation.furtestCard))
+		{
+			bool wasParentClosed = cardNode.HasPreviousCard() && cardNode.GetPreviousCard().isClosed;
+			DraggedCardData draggedCardDataLocal = new(
+			cardNode,
+			cardNode.GetParent<Area2D>(),
+			cardNode.GlobalPosition - GetGlobalMousePosition(),
+			cardNode.ZIndex,
+			wasParentClosed
+			);
+
+			Area2D dropPoint = DiamondFoundation.furtestCard;
+			undoRedo.CreateAction("auto diamond");
+			undoRedo.AddDoMethod(Callable.From(() => DropHere(dropPoint, draggedCardDataLocal)));
+			undoRedo.AddUndoMethod(Callable.From(() => ReverseDropHere(dropPoint, draggedCardDataLocal)));
+			undoRedo.CommitAction();
+		};
+
+	}	
 }

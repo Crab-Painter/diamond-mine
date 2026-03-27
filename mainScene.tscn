@@ -13,7 +13,7 @@
 [ext_resource type="Script" uid="uid://bn6b36qx4onyk" path="res://scripts/UI/CurrentChange.cs" id="7_ykwv5"]
 [ext_resource type="Script" uid="uid://b88j5uuy5jto" path="res://scripts/UI/Average.cs" id="8_nlk40"]
 
-[node name="Main" type="Node2D" unique_id=835333600 node_paths=PackedStringArray("UserInterface")]
+[node name="Main" type="Node2D" unique_id=835333600 node_paths=PackedStringArray("UserInterface", "DiamondFoundation", "DoubleClickTimer")]
 script = ExtResource("1_14l1l")
 CardScene = ExtResource("2_uqts1")
 UserInterface = NodePath("UI")
@@ -24,6 +24,8 @@ DebugProbeActionName = "Debug"
 UndoActionName = "Undo"
 RedoActionName = "Redo"
 NewGameActionName = "New Game"
+DiamondFoundation = NodePath("DiamondFoundation")
+DoubleClickTimer = NodePath("DoubleClickTimer")
 
 [node name="UI" type="Control" parent="." unique_id=1466179020 node_paths=PackedStringArray("UndoButton", "RedoButton", "NewGameButton", "PlayerMessage", "PointsCounter", "ChangeArrow", "CurrentChange", "Average")]
 layout_mode = 3
@@ -147,3 +149,8 @@ position = Vector2(614, 138)
 
 [node name="DiamondFoundation" parent="." unique_id=790179386 instance=ExtResource("5_6mfv6")]
 position = Vector2(321, 54)
+
+[node name="DoubleClickTimer" type="Timer" parent="." unique_id=58959802]
+wait_time = 0.2
+one_shot = true
+ignore_time_scale = true
