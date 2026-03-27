@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://do31vfnbsjn74"]
 
-[ext_resource type="Script" uid="uid://ca27rnuy1nuyw" path="res://Card.cs" id="1_64stc"]
+[ext_resource type="Script" uid="uid://dvwjvedbnjqdq" path="res://scripts/Card.cs" id="1_64stc"]
 [ext_resource type="PackedScene" uid="uid://dv6cf8p3p804w" path="res://CollisionPolygonScene.tscn" id="2_8vm5s"]
 
 [node name="Card" type="Area2D" unique_id=1837023572]

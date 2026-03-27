@@ -17,6 +17,13 @@ public partial class UIManager : Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		//temp hide statistics ui before ending playtest
+		CurrentChange.Hide();
+		ChangeArrow.Hide();
+		Average.Hide();
+		/////////////////////////////////
+
+
 		UpdatePoints(0);
 	}
 

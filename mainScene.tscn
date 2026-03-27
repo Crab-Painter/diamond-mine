@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bcc6o3vf33fnq" path="res://scripts/GameManager.cs" id="1_14l1l"]
 [ext_resource type="Texture2D" uid="uid://btp0bhhh2kv68" path="res://assets/back.png" id="1_iwpey"]
-[ext_resource type="Script" uid="uid://bvspxrmy52a54" path="res://scripts/UI/UI.cs" id="2_u7har"]
+[ext_resource type="Script" uid="uid://dmy2xthr2gcyk" path="res://scripts/UI/UIManager.cs" id="2_u7har"]
+[ext_resource type="PackedScene" uid="uid://do31vfnbsjn74" path="res://cardScene.tscn" id="2_uqts1"]
 [ext_resource type="PackedScene" uid="uid://b0deu5nx81f20" path="res://FoundationScene.tscn" id="4_61od6"]
 [ext_resource type="PackedScene" uid="uid://bfgeu4ywwhtle" path="res://DiamondFoundationScene.tscn" id="5_6mfv6"]
 [ext_resource type="Texture2D" uid="uid://cmso85rgeisfu" path="res://assets/undoIcon.png" id="5_bnlnp"]
@@ -12,15 +13,32 @@
 [ext_resource type="Script" uid="uid://bn6b36qx4onyk" path="res://scripts/UI/CurrentChange.cs" id="7_ykwv5"]
 [ext_resource type="Script" uid="uid://b88j5uuy5jto" path="res://scripts/UI/Average.cs" id="8_nlk40"]
 
-[node name="Main" type="Node2D" unique_id=835333600]
+[node name="Main" type="Node2D" unique_id=835333600 node_paths=PackedStringArray("UserInterface")]
 script = ExtResource("1_14l1l")
+CardScene = ExtResource("2_uqts1")
+UserInterface = NodePath("UI")
+DragedCardZIndex = 99
+CardStackingTransform = 21.0
+DragActionName = "LMB"
+DebugProbeActionName = "Debug"
+UndoActionName = "Undo"
+RedoActionName = "Redo"
+NewGameActionName = "New Game"
 
-[node name="UI" type="Control" parent="." unique_id=1466179020]
+[node name="UI" type="Control" parent="." unique_id=1466179020 node_paths=PackedStringArray("UndoButton", "RedoButton", "NewGameButton", "PlayerMessage", "PointsCounter", "ChangeArrow", "CurrentChange", "Average")]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 640.0
 offset_bottom = 360.0
 script = ExtResource("2_u7har")
+UndoButton = NodePath("Controls container/ButtonsContainer/Undo")
+RedoButton = NodePath("Controls container/ButtonsContainer/Redo")
+NewGameButton = NodePath("Controls container/ButtonsContainer/NewGame")
+PlayerMessage = NodePath("Controls container/Message")
+PointsCounter = NodePath("Statistics container/PointsCounter")
+ChangeArrow = NodePath("Statistics container/Change arrow")
+CurrentChange = NodePath("Statistics container/Current change")
+Average = NodePath("Statistics container/Average")
 
 [node name="Controls container" type="VBoxContainer" parent="UI" unique_id=924964629]
 layout_mode = 0
@@ -62,12 +80,15 @@ grow_horizontal = 0
 custom_minimum_size = Vector2(90, 20)
 layout_mode = 2
 script = ExtResource("5_uqts1")
+BaseText = "Points: "
 
 [node name="Change arrow" type="TextureRect" parent="UI/Statistics container" unique_id=737070763]
 custom_minimum_size = Vector2(8, 40)
 layout_mode = 2
 expand_mode = 1
 script = ExtResource("6_us837")
+arrowUpPath = "res://assets/upArrow.png"
+arrowDownPath = "res://assets/downArrow.png"
 
 [node name="Current change" type="Label" parent="UI/Statistics container" unique_id=56750421]
 custom_minimum_size = Vector2(50, 0)
@@ -77,6 +98,7 @@ script = ExtResource("7_ykwv5")
 [node name="Average" type="Label" parent="UI/Statistics container" unique_id=1303718526]
 layout_mode = 2
 script = ExtResource("8_nlk40")
+BaseText = "Average: "
 
 [node name="Background" type="Sprite2D" parent="." unique_id=164644663]
 z_index = -1
