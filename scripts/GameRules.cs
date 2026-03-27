@@ -118,12 +118,8 @@ public static class GameRules
 				return valueDelta == 1;
 			}
 		}
-
-		if (draggedCard.IsDiamonds())
-		{
-			return nodeToDropOn.Name == "DiamondFoundation";
-		}
-		return true;
+		
+		return draggedCard.IsDiamonds() == (nodeToDropOn.Name == "DiamondFoundation");
 	}
 
 	//Updates point with assumption that card drag-n-drop was successfull
