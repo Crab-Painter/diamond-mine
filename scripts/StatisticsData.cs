@@ -1,5 +1,4 @@
-using Godot;
-
+namespace Diamondmine.scripts;
 public class StatisticsData
 {
     public uint games = 1;

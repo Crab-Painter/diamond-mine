@@ -1,5 +1,6 @@
 using Godot;
-using System;
+
+namespace Diamondmine.scripts.UI;
 
 public partial class PointsCounter : Label
 {

@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+namespace Diamondmine.scripts;
+
 public static class GameRules
 {
 	public const uint COLLISION_LAYER_DRAGGABLE = 1;

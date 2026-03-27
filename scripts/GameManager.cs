@@ -1,10 +1,10 @@
 using Godot;
-using System;
-using System.Data;
+
+namespace Diamondmine.scripts;
 public partial class GameManager : Node2D
 {
 	[Export] public PackedScene CardScene {get;set;}
-	[Export] public UI UserInterface {get;set;}
+	[Export] public UI.UIManager UserInterface {get;set;}
 	[Export] public int DragedCardZIndex {get;set;}
 	[Export] public float CardStackingTransform {get;set;}
 	[Export] public string DragActionName {get;set;}

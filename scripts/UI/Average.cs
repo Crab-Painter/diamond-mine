@@ -1,12 +1,12 @@
 using Godot;
-using System;
 
+namespace Diamondmine.scripts.UI;
 public partial class Average : Label
 {
 	[Export] public string BaseText;
 
 	public void Update()
     {
-        Text = BaseText + (new StatisticsData()).getAverage().ToString("f2");
+        Text = BaseText + (new StatisticsData()).GetAverage().ToString("f2");
     }
 }

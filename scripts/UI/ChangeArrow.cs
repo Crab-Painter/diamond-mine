@@ -1,17 +1,16 @@
 using Godot;
 using System;
 
+namespace Diamondmine.scripts.UI;
+ 
+
 public partial class ChangeArrow : TextureRect
 {
 	[Export] public string arrowUpPath;
 	[Export] public string arrowDownPath;
-	public override void _Ready()
-	{
-		Update(0);
-	}
     public void Update(uint points)
     {
-		int sign = Math.Sign((new StatisticsData()).getChange(points));
+		int sign = Math.Sign((new StatisticsData()).GetChange(points));
 		switch (sign)
 		{
 			case 1:

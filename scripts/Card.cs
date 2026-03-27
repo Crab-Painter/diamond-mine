@@ -1,5 +1,6 @@
 using Godot;
-using System;
+
+namespace Diamondmine.scripts;
 
 public partial class Card : Area2D
 {

@@ -1,5 +1,6 @@
 using Godot;
 
+namespace Diamondmine.scripts;
 public class DraggedCardData(
     Card cardNode,
     Area2D cardParentNode,

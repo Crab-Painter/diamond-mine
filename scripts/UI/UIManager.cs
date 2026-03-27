@@ -1,6 +1,8 @@
 using Godot;
 
-public partial class UI : Control
+namespace Diamondmine.scripts.UI;
+
+public partial class UIManager : Control
 {
 	[Export] public Button UndoButton {get;set;}
 	[Export] public Button RedoButton {get;set;}
