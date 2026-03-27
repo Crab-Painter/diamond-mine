@@ -26,8 +26,8 @@ public partial class GameManager : Node2D
 		lose
 	}
 	private States state = States.newGame;
-	private int _points = 0;
-	public int Points
+	private uint _points = 0;
+	public uint Points
 	{
 		get
 		{
@@ -36,7 +36,7 @@ public partial class GameManager : Node2D
 		set
 		{
 			_points = value;	
-			UserInterface.PointsCounter.UpdatePoints(Points);
+			UserInterface.UpdatePoints(Points);
 		}
 	}
 	private UndoRedo undoRedo = new();
@@ -46,7 +46,8 @@ public partial class GameManager : Node2D
 	{
 		UserInterface.RedoButton.Pressed += Redo;
 		UserInterface.UndoButton.Pressed += Undo;
-		UserInterface.NewGameButton.Pressed += StartNewGame;	
+		UserInterface.NewGameButton.Pressed += StartNewGame;
+		StatisticsData.Load();	
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -195,7 +196,6 @@ public partial class GameManager : Node2D
 			}
 			GD.Print("double drop bug. Nodes are " + names);
 			return false;
-			// throw new DataException("wrong number of droppable items. Need to check collision layers management. Nodes are: " + names);
 		}
 
 		Area2D dropPoint = (Area2D)(GodotObject)matches[0]["collider"];

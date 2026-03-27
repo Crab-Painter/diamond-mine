@@ -125,11 +125,11 @@ public static class GameRules
 	}
 
 	//Updates point with assumption that card drag-n-drop was successfull
-	public static int CalculatePointsChange(Card draggedCard)
+	public static uint CalculatePointsChange(Card draggedCard)
 	{
 		if (draggedCard.IsDiamonds())
 		{
-			return draggedCard.value;
+			return (uint)draggedCard.value;
 		}
 
 		//check full suit pile
@@ -173,7 +173,7 @@ public static class GameRules
 		return 3;
 	}
 
-	public static bool IsWin(int pointsAmount)
+	public static bool IsWin(uint pointsAmount)
 	{
 		return pointsAmount == 100;
 	}
