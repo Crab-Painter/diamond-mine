@@ -126,19 +126,16 @@ public partial class GameManager : Node2D
 
 		if (@event.IsActionPressed(UndoActionName))
 		{
-			GD.Print("Undo pressed");
 			Undo();
 		}
 
 		if (@event.IsActionPressed(RedoActionName))
 		{
-			GD.Print("Redo pressed");
 			Redo();
 		}
 
 		if (@event.IsActionPressed(NewGameActionName))
 		{
-			GD.Print("New game pressed");
 			StartNewGame();
 		}
 	}
@@ -339,16 +336,19 @@ public partial class GameManager : Node2D
 
 	public void Undo()
 	{
+		GD.Print("Executing undo");
 		undoRedo.Undo();
 	}
 
 	public void Redo()
 	{
+		GD.Print("Executing redo");
 		undoRedo.Redo();
 	}
 
 	private void StartNewGame()
 	{
+		GD.Print("Starting new game");
 		GameRules.ClearBoardFromCards(this);
 		Points = 0;
 		undoRedo = new();
@@ -376,13 +376,8 @@ public partial class GameManager : Node2D
 		try
 		{
 			cardNode = (Card)(GodotObject)matches[0]["collider"];
-		}
-		catch
-		{
-			GD.Print("not a card");
-			return;
-		}
-		
+
+					
 		int maxZId = cardNode.ZIndex;
 		foreach (Godot.Collections.Dictionary match in matches)
 		{
@@ -395,6 +390,19 @@ public partial class GameManager : Node2D
 		}
 
 		GD.Print(cardNode.ToString());
+		}
+		catch
+		{
+			try
+			{
+				Area2D area2DNode = (Area2D)(GodotObject)matches[0]["collider"];
+			}
+			catch
+			{
+				GD.Print("not a card");
+				return;
+			}
+		}
 	}
 
 	private bool IsDoubleClick()

@@ -88,12 +88,16 @@ public partial class Card : Area2D
 
 	public bool HasPreviousCard()
 	{
-		return HasNode("../../Card");
+		Node parent = GetParent();
+		bool correctName = parent.Name == "Card";
+		bool correctClass = parent is Card;
+
+		return correctClass && correctName;
 	}
 
 	public Card GetPreviousCard()
 	{
-		return GetNode<Card>("../../Card");
+		return (Card)GetParent();
 	}
 
 	public bool HasNextCard()
