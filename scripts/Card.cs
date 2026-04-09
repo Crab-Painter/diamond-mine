@@ -42,6 +42,7 @@ public partial class Card : Area2D
 
 	public void SetZIndexRecursive(int zId)
 	{
+		GD.Print(Name + " " + value.ToString() + " of " + ((GameRules.Suits)suit).ToString() + ". Z index is " + zId.ToString());
 		ZIndex = zId;
 		if (HasNode("./Card"))
 		{

@@ -80,22 +80,30 @@ public partial class GameManager : Node2D
 				) + draggedCardData.RelativeDragVector;
 				break;
 		}
+
+		// Godot.Logger logger = new();
 	}
 
 	public override void _Input(InputEvent @event)
 	{
+		
+
+
 		if (@event.IsActionPressed(DragActionName))
 		{
+			GD.Print("Drag pressed");
 			if (IsDoubleClick())
 			{
+				GD.Print("Double click registered");
 				AutoDiamond();
 				return;
 			}
-			DetectTopCard();
+			StartDrag();
 		}                  
 
 		if (@event.IsActionReleased(DragActionName))
 		{
+			GD.Print("Drag released");
 			if (state != States.cardDragged)
 			{
 				return;
@@ -112,26 +120,30 @@ public partial class GameManager : Node2D
 
 		if (@event.IsActionPressed(DebugProbeActionName))
 		{
+			GD.Print("Debug pressed");
 			GetDebugInfoAtCursor();
 		}
 
 		if (@event.IsActionPressed(UndoActionName))
 		{
+			GD.Print("Undo pressed");
 			Undo();
 		}
 
 		if (@event.IsActionPressed(RedoActionName))
 		{
+			GD.Print("Redo pressed");
 			Redo();
 		}
 
 		if (@event.IsActionPressed(NewGameActionName))
 		{
+			GD.Print("New game pressed");
 			StartNewGame();
 		}
 	}
 
-	private void DetectTopCard()
+	private void StartDrag()
 	{
 		//check which areas2D associated with cards are in the point on mouse cursor
 		var spaceState = GetWorld2D().DirectSpaceState;
@@ -167,6 +179,7 @@ public partial class GameManager : Node2D
 			cardNode.ZIndex,
 			wasParentClosed
 		);
+		GD.Print(draggedCardData.ToString());
 		state = States.cardDragged;
 		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
 		cardNode.SetZIndexRecursive(DragedCardZIndex);
@@ -397,7 +410,6 @@ public partial class GameManager : Node2D
 	}
 	private void AutoDiamond()
 	{
-		GD.Print("double click registered");
 		//check which areas2D associated with cards are in the point on mouse cursor
 		var spaceState = GetWorld2D().DirectSpaceState;
 		PhysicsPointQueryParameters2D queryParams = new();

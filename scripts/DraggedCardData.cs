@@ -9,6 +9,17 @@ public class DraggedCardData(
     bool wasParentClosed
     )
 {
+    public override string ToString()
+    {
+        string result = base.ToString();
+        result += ". cadrNode: " + _cardNode.ToString();
+        result += ". cardParentNode: " + _cardParentNode.ToString();
+        result += ". relativeDragVector: " + _relativeDragVector.ToString();
+        result += ". cardZIndexGlobal: " + _cardZIndexGlobal.ToString();
+        result += ". wasParentClosed: " + _wasParentClosed.ToString();
+
+        return result;
+    }
     private readonly Card _cardNode = cardNode;
     public Card CardNode
     {
