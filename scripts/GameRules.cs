@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Diamondmine.scripts;
 
@@ -80,18 +81,37 @@ public static class GameRules
 	{
 		for (int i=1;i<=13;i++)
 		{
-			Foundation foundation = rootNode.GetNode<Foundation>("Foundation"+i);
-			var children = foundation.GetChildren();
-			foreach (Node child in children)
-			{
-				if (child.Name == "Card")
-				{
-					child.QueueFree();
-				}
-			}
-			foundation.furtestCard = foundation;
-			foundation.CollisionLayer = 0;
+			
 		}
+
+		bool includeChildrenOfChildren = false;//it's false by default, but i leave this here for clearance, because i already had this question
+		var rootChildren = rootNode.GetChildren(includeChildrenOfChildren);
+		string pattern = @"^Foundation\d+$";
+		Regex r = new(pattern);
+		foreach (Node rootChild in rootChildren)
+		{
+			if (r.IsMatch(rootChild.Name))
+			{
+				Foundation foundation = (Foundation)rootChild;
+				var children = foundation.GetChildren();
+				foreach (Node child in children)
+				{
+					if (child.Name == "Card")
+					{
+						child.QueueFree();
+					}
+				}
+				foundation.furtestCard = foundation;
+				foundation.CollisionLayer = 0;
+			}
+
+// comment for now to catch the reason of the bug first, not just mask its followups
+			// if (rootChild.Name == "Card")
+			// {
+			// 	rootChild.QueueFree();
+			// }
+		}
+
 		Area2D diamondFoundation = rootNode.GetNode<Area2D>("DiamondFoundation");
 		var diamondChildren = diamondFoundation.GetChildren();
 		foreach (Node child in diamondChildren)

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Godot;
 
 namespace Diamondmine.scripts;
@@ -371,31 +372,17 @@ public partial class GameManager : Node2D
 			return;
 		}
 
-		Card cardNode;
+		Area2D intersectNode;
 		//get the top card (highest absolute Z index)
 		try
 		{
-			cardNode = (Card)(GodotObject)matches[0]["collider"];
-
-					
-		int maxZId = cardNode.ZIndex;
-		foreach (Godot.Collections.Dictionary match in matches)
-		{
-			Card collisionNode = (Card)(GodotObject)match["collider"];
-			if (collisionNode.ZIndex > maxZId)
-			{
-				maxZId = collisionNode.ZIndex;
-				cardNode = collisionNode;
-			}
-		}
-
-		GD.Print(cardNode.ToString());
+			intersectNode = (Card)(GodotObject)matches[0]["collider"];
 		}
 		catch
 		{
 			try
 			{
-				Area2D area2DNode = (Area2D)(GodotObject)matches[0]["collider"];
+				intersectNode = (Area2D)(GodotObject)matches[0]["collider"];
 			}
 			catch
 			{
@@ -403,6 +390,31 @@ public partial class GameManager : Node2D
 				return;
 			}
 		}
+		
+		int maxZId = intersectNode.ZIndex;
+		foreach (Godot.Collections.Dictionary match in matches)
+		{
+			Area2D collisionNode = (Area2D)(GodotObject)match["collider"];
+			if (collisionNode.ZIndex > maxZId)
+			{
+				maxZId = collisionNode.ZIndex;
+				intersectNode = collisionNode;
+			}
+		}
+
+		Node currentNode = intersectNode;
+		string pattern = @"Foundation";
+		Regex r = new(pattern);
+		string log = currentNode.Name + " " + currentNode.ToString();
+		do
+		{
+			Node parent = currentNode.GetParent();
+			currentNode = parent;
+			log += ". -> " + currentNode.Name + " " + currentNode.ToString();
+		}
+		while (!r.IsMatch(currentNode.Name) || currentNode.Name == Name);
+
+		GD.Print(log);
 	}
 
 	private bool IsDoubleClick()
