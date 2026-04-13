@@ -170,8 +170,9 @@ public partial class GameManager : Node2D
 
 		//change gamestate
 		bool hasPreviousCard = cardNode.HasPreviousCard();
+		GD.Print("hasPreviousCard: " + hasPreviousCard);
 		bool wasParentClosed = hasPreviousCard && cardNode.GetPreviousCard().isClosed;
-		GD.Print("hasPreviousCard: " + hasPreviousCard + ", previousCardIsClosed: " + cardNode.GetPreviousCard().isClosed);
+		GD.Print("wasParentClosed: " + wasParentClosed);
 
 		draggedCardData = new(
 			cardNode,
