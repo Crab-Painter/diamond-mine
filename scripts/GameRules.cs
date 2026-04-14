@@ -18,13 +18,6 @@ public static class GameRules
 		spades = 4
 	}
 
-	private static Dictionary<int,bool> collectedFullSuits = new()
-	{
-		{(int)Suits.hearts, false},
-		{(int)Suits.clubs, false},
-		{(int)Suits.spades, false}
-	};
-
     public static void GenerateDeck(GameManager rootNode, PackedScene cardScene)
 	{
 		int[] deckIds = new int[52];
@@ -143,51 +136,64 @@ public static class GameRules
 	}
 
 	//Updates point with assumption that card drag-n-drop was successfull
-	public static uint CalculatePointsChange(Card draggedCard)
+	public static uint CalculatePointsChange(GameManager gameManager, Card draggedCard)
 	{
+		GD.Print("CalculatePointsChange");
 		if (draggedCard.IsDiamonds())
 		{
 			return (uint)draggedCard.value;
 		}
 
+		GD.Print("Not Diamonds");
 		//check full suit pile
-		if (collectedFullSuits[draggedCard.suit])
+		if (gameManager.gameRulesData.CollectedFullSuits[draggedCard.suit])//todo remove dependence on inner structure knowledge
 		{
+			GD.Print("Already collected");
 			return 0;
 		}
 		// going up the tree
+		GD.Print("Going up");
 		Card cardPointer = draggedCard;
 		while(cardPointer.HasPreviousCard())
 		{
 			Card previousCard = cardPointer.GetPreviousCard();
 			if (previousCard.suit != cardPointer.suit || (previousCard.value - cardPointer.value != 1))
 			{
+				GD.Print("Not in order or wrong suit");
 				return 0;
 			}
 			cardPointer = previousCard;
+			GD.Print("Current new value is " + cardPointer.value.ToString());
 		}
+		GD.Print("ended while loop");
 		if (cardPointer.value != 13)
 		{
+			GD.Print("foundation card is not a King");
 			return 0;
 		}
 
 		//going dowh the tree
+		GD.Print("going dowh");
 		cardPointer = draggedCard;
 		while(cardPointer.HasNextCard())
 		{
 			Card nexrCard = cardPointer.GetNextCard();
 			if (nexrCard.suit != cardPointer.suit || (cardPointer.value - nexrCard.value != 1))
 			{
+				GD.Print("Not in order or wrong suit");
 				return 0;
 			}
 			cardPointer = nexrCard;
+			GD.Print("Current new value is " + cardPointer.value.ToString());
 		}
+		GD.Print("ended while loop");
 		if (cardPointer.value != 1)
 		{
+			GD.Print("last card is not an Ace");
 			return 0;
 		}
 
-		collectedFullSuits[draggedCard.suit] = true;
+		gameManager.gameRulesData.CollectedFullSuits[draggedCard.suit] = true;//todo remove dependence on inner structure knowledge
 		return 3;
 	}
 

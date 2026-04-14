@@ -16,7 +16,7 @@ public partial class GameManager : Node2D
 	[Export] public Foundation DiamondFoundation {get;set;}
 	[Export] public Timer DoubleClickTimer {get;set;}
 
-
+	public GameRulesData gameRulesData = GameRulesData.getData();
 
 
 
@@ -63,6 +63,7 @@ public partial class GameManager : Node2D
 			case States.idle:
 				return;
 			case States.newGame:
+				UserInterface.PlayerMessage.Text = "";
 				GameRules.GenerateDeck(this, CardScene);
 				state = States.idle;
 				break;
@@ -232,6 +233,7 @@ public partial class GameManager : Node2D
 		undoRedo.CreateAction("drag card");
 		undoRedo.AddDoMethod(Callable.From(() => DropHere(dropPoint, draggedCardDataLocal)));
 		undoRedo.AddUndoMethod(Callable.From(() => ReverseDropHere(dropPoint, draggedCardDataLocal)));
+		undoRedo.AddUndoProperty(this, "Points", Points);
 		undoRedo.CommitAction();
 		return true;
 	}
@@ -276,7 +278,7 @@ public partial class GameManager : Node2D
 		}
 
 		//game rules(win, lose, points ect) processing
-		Points += GameRules.CalculatePointsChange(draggedCardNode);
+		Points += GameRules.CalculatePointsChange(this, draggedCardNode);
 		if (GameRules.IsWin(Points))
 		{
 			state = States.win;
@@ -327,7 +329,7 @@ public partial class GameManager : Node2D
 		}
 
 		//game rules(win, lose, points ect) processing
-		Points -= GameRules.CalculatePointsChange(draggedCardNode);
+		// Points -= GameRules.CalculatePointsChange(draggedCardNode);
 	}
 
 	private float GetPositionYAfterDrop(Area2D dropPoint)
@@ -479,8 +481,8 @@ public partial class GameManager : Node2D
 			undoRedo.CreateAction("auto diamond");
 			undoRedo.AddDoMethod(Callable.From(() => DropHere(dropPoint, draggedCardDataLocal)));
 			undoRedo.AddUndoMethod(Callable.From(() => ReverseDropHere(dropPoint, draggedCardDataLocal)));
+			undoRedo.AddUndoProperty(this, "Points", Points);
 			undoRedo.CommitAction();
-		};
-
+		}	
 	}	
 }
