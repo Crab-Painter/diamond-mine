@@ -328,6 +328,7 @@ public partial class GameManager : Node2D
 			draggedCardNode.CollisionLayer = GameRules.COLLISION_LAYER_DRAGGABLE;
 		}
 
+		//game rules(win, lose, points ect) processing
 		string arrStr = "";
 		foreach (KeyValuePair<int,bool> b in backupCollectedFullSuits)
 		{
@@ -335,8 +336,6 @@ public partial class GameManager : Node2D
 		}
 		GD.Print("backupCollectedFullSuits " + arrStr);
 		GameRules.CollectedFullSuits = backupCollectedFullSuits.ToDictionary(el=>el.Key, el=>el.Value);
-		//game rules(win, lose, points ect) processing
-		// Points -= GameRules.CalculatePointsChange(draggedCardNode);
 	}
 
 	private float GetPositionYAfterDrop(Area2D dropPoint)
