@@ -10,4 +10,12 @@ public partial class Foundation : Area2D
 	{
 		furtestCard = this;
 	}
+	    
+	public override string ToString()
+    {
+		string result = Name + " Collision layer is " + CollisionLayer.ToString();
+		result += " furtestCard is ";
+		result += furtestCard == this ? "this" : furtestCard.ToString();
+        return base.ToString() + result;
+    }
 }

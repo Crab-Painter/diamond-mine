@@ -17,6 +17,12 @@ public static class GameRules
 		clubs = 3,
 		spades = 4
 	}
+	public static Dictionary<int,bool> CollectedFullSuits {get;set;} = new()
+	{
+		{(int)Suits.hearts, false},
+		{(int)Suits.clubs, false},
+		{(int)Suits.spades, false}
+	};
 
     public static void GenerateDeck(GameManager rootNode, PackedScene cardScene)
 	{
@@ -25,7 +31,7 @@ public static class GameRules
 		{
 			deckIds[i] = i;
 		}
-		(new Random()).Shuffle(deckIds);
+		new Random().Shuffle(deckIds);
 
 		int foundationId = 1;
 		int zId = 1;
@@ -70,7 +76,18 @@ public static class GameRules
 		}		
 	}
 
-	public static void ClearBoardFromCards(GameManager rootNode)
+	public static void StartNewGame(GameManager rootNode)
+	{
+		ClearBoardFromCards(rootNode);
+		CollectedFullSuits = new()
+		{
+			{(int)Suits.hearts, false},
+			{(int)Suits.clubs, false},
+			{(int)Suits.spades, false}
+		};
+	}
+
+	private static void ClearBoardFromCards(GameManager rootNode)
 	{
 		for (int i=1;i<=13;i++)
 		{
@@ -105,7 +122,7 @@ public static class GameRules
 			// }
 		}
 
-		Area2D diamondFoundation = rootNode.GetNode<Area2D>("DiamondFoundation");
+		Foundation diamondFoundation = rootNode.GetNode<Foundation>("DiamondFoundation");
 		var diamondChildren = diamondFoundation.GetChildren();
 		foreach (Node child in diamondChildren)
 		{
@@ -115,10 +132,12 @@ public static class GameRules
 			}
 		}
 		diamondFoundation.CollisionLayer = COLLISION_LAYER_DROPPABLE;
+		diamondFoundation.furtestCard = diamondFoundation;
 	}
 
 	public static bool CanDrop(Card draggedCard, Area2D nodeToDropOn)
 	{
+		GD.Print("CanDropStart");
 		if (nodeToDropOn is Card cardToDropOn)
 		{
 			int valueDelta = cardToDropOn.value - draggedCard.value;
@@ -132,11 +151,15 @@ public static class GameRules
 			}
 		}
 		
+		GD.Print("draggedCard.IsDiamonds() " + draggedCard.IsDiamonds().ToString());
+		GD.Print("nodeToDropOn.Name == \"DiamondFoundation\" " + (nodeToDropOn.Name == "DiamondFoundation").ToString());
+
+		
 		return draggedCard.IsDiamonds() == (nodeToDropOn.Name == "DiamondFoundation");
 	}
 
 	//Updates point with assumption that card drag-n-drop was successfull
-	public static uint CalculatePointsChange(GameManager gameManager, Card draggedCard)
+	public static uint CalculatePointsChange(Card draggedCard)
 	{
 		GD.Print("CalculatePointsChange");
 		if (draggedCard.IsDiamonds())
@@ -146,7 +169,7 @@ public static class GameRules
 
 		GD.Print("Not Diamonds");
 		//check full suit pile
-		if (gameManager.gameRulesData.CollectedFullSuits[draggedCard.suit])//todo remove dependence on inner structure knowledge
+		if (CollectedFullSuits[draggedCard.suit])
 		{
 			GD.Print("Already collected");
 			return 0;
@@ -193,7 +216,7 @@ public static class GameRules
 			return 0;
 		}
 
-		gameManager.gameRulesData.CollectedFullSuits[draggedCard.suit] = true;//todo remove dependence on inner structure knowledge
+		CollectedFullSuits[draggedCard.suit] = true;
 		return 3;
 	}
 
