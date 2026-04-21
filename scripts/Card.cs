@@ -2,15 +2,11 @@ using Godot;
 
 namespace Diamondmine.scripts;
 
-public partial class Card : Area2D
+public partial class Card : Area2D, IHighlightable
 {
-	/*
-	expected scene structure:
-	Area2D
-	--CollisionShape2D
-	--Sprite2D
-	*/
 	[Export] public string pathToSprite;
+	[Export] public string pathToHighlighter;
+
 	public int value;
 	public int suit;
 	public bool isClosed;
@@ -35,9 +31,10 @@ public partial class Card : Area2D
 	{
 	}
 
-	public Sprite2D GetSpriteNode()
+	public void SetCardImage(Texture2D texture)
 	{
-		return (Sprite2D)GetNode(pathToSprite);
+		var sprite = (Sprite2D)GetNode(pathToSprite);
+		sprite.Texture = texture;
 	}
 
 	public void SetZIndexRecursive(int zId)
@@ -59,7 +56,7 @@ public partial class Card : Area2D
 		}
 
 		Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
-		GetSpriteNode().Texture = texture;
+		SetCardImage(texture);
 		CollisionLayer = GameRules.COLLISION_LAYER_DRAGGABLE;
 		if (!IsDiamonds())
 		{
@@ -76,7 +73,7 @@ public partial class Card : Area2D
 		}
 
 		Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/CardBack.png");
-		GetSpriteNode().Texture = texture;
+		SetCardImage(texture);
 		CollisionLayer = 0;
 		isClosed = true;
 	}
@@ -108,5 +105,16 @@ public partial class Card : Area2D
 	public Card GetNextCard()
 	{
 		return GetNode<Card>("./Card");
+	}
+
+	public void HighlightOn()
+	{
+		var highlighter = (Sprite2D)GetNode(pathToHighlighter);
+		highlighter.Visible = true;
+	}
+	public void HighlightOff()
+	{
+		var highlighter = (Sprite2D)GetNode(pathToHighlighter);
+		highlighter.Visible = false;
 	}
 }

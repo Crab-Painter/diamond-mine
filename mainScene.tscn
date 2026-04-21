@@ -5,7 +5,6 @@
 [ext_resource type="Script" uid="uid://dmy2xthr2gcyk" path="res://scripts/UI/UIManager.cs" id="2_u7har"]
 [ext_resource type="PackedScene" uid="uid://do31vfnbsjn74" path="res://cardScene.tscn" id="2_uqts1"]
 [ext_resource type="PackedScene" uid="uid://b0deu5nx81f20" path="res://FoundationScene.tscn" id="4_61od6"]
-[ext_resource type="PackedScene" uid="uid://bfgeu4ywwhtle" path="res://DiamondFoundationScene.tscn" id="5_6mfv6"]
 [ext_resource type="Texture2D" uid="uid://cmso85rgeisfu" path="res://assets/undoIcon.png" id="5_bnlnp"]
 [ext_resource type="Script" uid="uid://cgmausfi6gdjn" path="res://scripts/UI/PointsCounter.cs" id="5_uqts1"]
 [ext_resource type="Script" uid="uid://17gxdfvthb4p" path="res://scripts/UI/ChangeArrow.cs" id="6_us837"]
@@ -147,8 +146,9 @@ position = Vector2(565, 138)
 [node name="Foundation13" parent="." unique_id=887504082 instance=ExtResource("4_61od6")]
 position = Vector2(614, 138)
 
-[node name="DiamondFoundation" parent="." unique_id=790179386 instance=ExtResource("5_6mfv6")]
+[node name="DiamondFoundation" parent="." unique_id=1084824046 instance=ExtResource("4_61od6")]
 position = Vector2(321, 54)
+collision_layer = 2
 
 [node name="DoubleClickTimer" type="Timer" parent="." unique_id=58959802]
 wait_time = 0.2

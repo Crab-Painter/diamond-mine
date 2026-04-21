@@ -46,7 +46,7 @@ public static class GameRules
 			card.value = value;
 			card.suit = suit;
 			card.Name = "Card";
-			card.GetSpriteNode().Texture = texture;
+			card.SetCardImage(texture);
 			card.ZIndex = zId;
 			card.isClosed = true;
 			card.CollisionLayer = 0;
