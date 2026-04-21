@@ -42,6 +42,7 @@ public partial class GameManager : Node2D
 		}
 	}
 	private UndoRedo undoRedo = new();
+	private readonly List<IHighlightable> highlightedAreas = [];
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -72,12 +73,8 @@ public partial class GameManager : Node2D
 				//show "no possible moves" msg
 				break;
 			case States.cardDragged:
-				Vector2 mousePosition = GetGlobalMousePosition();
-				Card draggedCardNode = draggedCardData.CardNode;
-				draggedCardNode.Position = new Vector2(
-					float.Clamp(mousePosition.X, 0, GetViewportRect().Size.X),//looks like this might cause productivity drop?
-					float.Clamp(mousePosition.Y, 0, GetViewportRect().Size.Y)
-				) + draggedCardData.RelativeDragVector;
+				DragProcessing();
+				HighlightProcessing();
 				break;
 		}
 
@@ -106,13 +103,19 @@ public partial class GameManager : Node2D
 				return;
 			}
 			state = States.idle;
+			Card draggedCardNode = draggedCardData.CardNode;
+
 			if (!TryDropHere())
 			{
-				Card draggedCardNode = draggedCardData.CardNode;
 				draggedCardNode.Reparent(draggedCardData.CrardParentNode, false);
 				draggedCardNode.Position = new Vector2(0,draggedCardData.CrardParentNode is Card ? CardStackingTransform : 0f);
 				draggedCardNode.SetZIndexRecursive(draggedCardData.CardZIndexGlobal);
 			}
+
+			draggedCardNode.Monitoring = false;//disable enteres/exited signals
+			draggedCardNode.AreaEntered -= DropHighlightOn;
+			draggedCardNode.AreaExited -= DropHighlightOff;
+			ResetHighlight();
 		}
 
 		if (@event.IsActionPressed(DebugProbeActionName))
@@ -181,46 +184,115 @@ public partial class GameManager : Node2D
 		state = States.cardDragged;
 		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
 		cardNode.SetZIndexRecursive(DragedCardZIndex);
+
+		cardNode.Monitoring = true;//enable enteres/exited signals
+		cardNode.AreaEntered += DropHighlightOn;
+		cardNode.AreaExited += DropHighlightOff;
+	}
+
+	private void DragProcessing()
+	{
+		Vector2 mousePosition = GetGlobalMousePosition();
+		Card draggedCardNode = draggedCardData.CardNode;
+		draggedCardNode.Position = new Vector2(
+			float.Clamp(mousePosition.X, 0, GetViewportRect().Size.X),//looks like this might cause productivity drop?
+			float.Clamp(mousePosition.Y, 0, GetViewportRect().Size.Y)
+		) + draggedCardData.RelativeDragVector;
+	}
+	private void HighlightProcessing()
+	{
+		if (highlightedAreas.Count == 0)
+		{
+			return;
+		}
+		else if (highlightedAreas.Count == 1)
+		{
+			highlightedAreas[0].HighlightOn();
+		}
+		else
+		{
+			Area2D closestArea = (Area2D)highlightedAreas[0];
+			float minDistance = draggedCardData.CardNode.GlobalPosition.DistanceTo(closestArea.GlobalPosition);
+			foreach (Area2D area in highlightedAreas.Cast<Area2D>())
+			{
+				float distanceCurrent = draggedCardData.CardNode.GlobalPosition.DistanceTo(area.GlobalPosition);
+				if (distanceCurrent < minDistance)
+				{
+					minDistance = distanceCurrent;
+					closestArea = area;
+				}
+			}
+
+			foreach (IHighlightable area in highlightedAreas)
+			{
+				if (((Area2D)area).GetRid() == closestArea.GetRid())
+				{
+					area.HighlightOn();
+				}
+				else
+				{
+					area.HighlightOff();
+				}
+			}
+		}
+		
+	}
+
+	private void DropHighlightOn(Area2D area)
+	{
+		if (GameRules.CanDrop(draggedCardData.CardNode, area))
+		{
+			if (area is IHighlightable highlightable)
+			{
+				highlightedAreas.Add(highlightable);
+				GD.Print("highlight count " + highlightedAreas.Count);
+			}
+		}
+	}
+
+	private void DropHighlightOff(Area2D area)
+	{
+		if (area is IHighlightable highlightable && highlightedAreas.Contains(highlightable))
+		{
+			highlightable.HighlightOff();
+			highlightedAreas.Remove(highlightable);
+		}
+	}
+	private void ResetHighlight()
+	{
+		foreach (IHighlightable area in highlightedAreas)
+		{
+			area.HighlightOff();
+		}
+		highlightedAreas.Clear();
 	}
 
 	private bool TryDropHere()
 	{
-		var spaceState = GetWorld2D().DirectSpaceState;
-		PhysicsPointQueryParameters2D queryParams = new();
-		queryParams.SetPosition(GetGlobalMousePosition());
-		queryParams.SetCollideWithAreas(true);
-		queryParams.SetCollisionMask(GameRules.COLLISION_LAYER_DROPPABLE);
-		queryParams.SetExclude([draggedCardData.CardNode.GetRid()]);
-		var matches = spaceState.IntersectPoint(queryParams);
-		if (matches.Count == 0)
+		if (highlightedAreas.Count == 0)
 		{
-			return false;
-		}
-		else if (matches.Count != 1)
-		{
-			string names = "";
-			foreach (var match in matches)
-			{
-				names += ((Node2D)(GodotObject)match["collider"]).Name;
-				names += ", ";
-			}
-			if (names == "Card, Card, ")
-			{
-				names = "";
-				foreach (var match in matches)
-				{
-					names += ((Card)(GodotObject)match["collider"]).ToString();
-					names += ", ";
-				}
-			}
-			GD.Print("double drop bug. Nodes are " + names);
 			return false;
 		}
 
-		Area2D dropPoint = (Area2D)(GodotObject)matches[0]["collider"];
-		if (!GameRules.CanDrop(draggedCardData.CardNode, dropPoint))
+		Area2D dropPoint;
+		if (highlightedAreas.Count == 1)
 		{
-			return false;
+			dropPoint = (Area2D)highlightedAreas[0];
+		}
+		else
+		{
+			Area2D closestArea = (Area2D)highlightedAreas[0];
+			float minDistance = draggedCardData.CardNode.GlobalPosition.DistanceTo(closestArea.GlobalPosition);
+			foreach (Area2D area in highlightedAreas.Cast<Area2D>())
+			{
+				float distanceCurrent = draggedCardData.CardNode.GlobalPosition.DistanceTo(area.GlobalPosition);
+				if (distanceCurrent < minDistance)
+				{
+					minDistance = distanceCurrent;
+					closestArea = area;
+				}
+			}
+			dropPoint = closestArea;
 		}
 
 
@@ -498,5 +570,5 @@ public partial class GameManager : Node2D
 			undoRedo.AddUndoProperty(this, "Points", Points);
 			undoRedo.CommitAction();
 		}	
-	}	
+	}
 }
