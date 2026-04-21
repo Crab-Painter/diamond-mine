@@ -17,7 +17,7 @@ script = ExtResource("1_14l1l")
 CardScene = ExtResource("2_uqts1")
 UserInterface = NodePath("UI")
 DragedCardZIndex = 99
-CardStackingTransform = 16.0
+CardStackingTransform = 17.0
 DragActionName = "LMB"
 DebugProbeActionName = "Debug"
 UndoActionName = "Undo"
@@ -108,46 +108,46 @@ position = Vector2(320, 180)
 texture = ExtResource("1_iwpey")
 
 [node name="Foundation1" parent="." unique_id=1027293535 instance=ExtResource("4_61od6")]
-position = Vector2(26, 138)
+position = Vector2(26, 114)
 
 [node name="Foundation2" parent="." unique_id=274586626 instance=ExtResource("4_61od6")]
-position = Vector2(75, 138)
+position = Vector2(75, 114)
 
 [node name="Foundation3" parent="." unique_id=2090025646 instance=ExtResource("4_61od6")]
-position = Vector2(124, 138)
+position = Vector2(124, 114)
 
 [node name="Foundation4" parent="." unique_id=1149214531 instance=ExtResource("4_61od6")]
-position = Vector2(173, 138)
+position = Vector2(173, 114)
 
 [node name="Foundation5" parent="." unique_id=1313745637 instance=ExtResource("4_61od6")]
-position = Vector2(222, 138)
+position = Vector2(222, 114)
 
 [node name="Foundation6" parent="." unique_id=1974903667 instance=ExtResource("4_61od6")]
-position = Vector2(271, 138)
+position = Vector2(271, 114)
 
 [node name="Foundation7" parent="." unique_id=500922360 instance=ExtResource("4_61od6")]
-position = Vector2(320, 138)
+position = Vector2(320, 114)
 
 [node name="Foundation8" parent="." unique_id=814129639 instance=ExtResource("4_61od6")]
-position = Vector2(369, 138)
+position = Vector2(369, 114)
 
 [node name="Foundation9" parent="." unique_id=1412397906 instance=ExtResource("4_61od6")]
-position = Vector2(418, 138)
+position = Vector2(418, 114)
 
 [node name="Foundation10" parent="." unique_id=1959195950 instance=ExtResource("4_61od6")]
-position = Vector2(467, 138)
+position = Vector2(467, 114)
 
 [node name="Foundation11" parent="." unique_id=1133101757 instance=ExtResource("4_61od6")]
-position = Vector2(516, 138)
+position = Vector2(516, 114)
 
 [node name="Foundation12" parent="." unique_id=1216167385 instance=ExtResource("4_61od6")]
-position = Vector2(565, 138)
+position = Vector2(565, 114)
 
 [node name="Foundation13" parent="." unique_id=887504082 instance=ExtResource("4_61od6")]
-position = Vector2(614, 138)
+position = Vector2(614, 114)
 
 [node name="DiamondFoundation" parent="." unique_id=1084824046 instance=ExtResource("4_61od6")]
-position = Vector2(321, 54)
+position = Vector2(320, 38)
 collision_layer = 2
 
 [node name="DoubleClickTimer" type="Timer" parent="." unique_id=58959802]
