@@ -212,10 +212,10 @@ public partial class GameManager : Node2D
 		else
 		{
 			Area2D closestArea = (Area2D)highlightedAreas[0];
-			float minDistance = draggedCardData.CardNode.Position.DistanceTo(closestArea.Position);
+			float minDistance = draggedCardData.CardNode.GlobalPosition.DistanceTo(closestArea.GlobalPosition);
 			foreach (Area2D area in highlightedAreas.Cast<Area2D>())
 			{
-				float distanceCurrent = draggedCardData.CardNode.Position.DistanceTo(area.Position);
+				float distanceCurrent = draggedCardData.CardNode.GlobalPosition.DistanceTo(area.GlobalPosition);
 				if (distanceCurrent < minDistance)
 				{
 					minDistance = distanceCurrent;
@@ -225,7 +225,7 @@ public partial class GameManager : Node2D
 
 			foreach (IHighlightable area in highlightedAreas)
 			{
-				if (area == closestArea)
+				if (((Area2D)area).GetRid() == closestArea.GetRid())
 				{
 					area.HighlightOn();
 				}
@@ -245,6 +245,7 @@ public partial class GameManager : Node2D
 			if (area is IHighlightable highlightable)
 			{
 				highlightedAreas.Add(highlightable);
+				GD.Print("highlight count " + highlightedAreas.Count);
 			}
 		}
 	}
@@ -272,7 +273,7 @@ public partial class GameManager : Node2D
 		{
 			return false;
 		}
-		
+
 		Area2D dropPoint;
 		if (highlightedAreas.Count == 1)
 		{
@@ -281,10 +282,10 @@ public partial class GameManager : Node2D
 		else
 		{
 			Area2D closestArea = (Area2D)highlightedAreas[0];
-			float minDistance = draggedCardData.CardNode.Position.DistanceTo(closestArea.Position);
+			float minDistance = draggedCardData.CardNode.GlobalPosition.DistanceTo(closestArea.GlobalPosition);
 			foreach (Area2D area in highlightedAreas.Cast<Area2D>())
 			{
-				float distanceCurrent = draggedCardData.CardNode.Position.DistanceTo(area.Position);
+				float distanceCurrent = draggedCardData.CardNode.GlobalPosition.DistanceTo(area.GlobalPosition);
 				if (distanceCurrent < minDistance)
 				{
 					minDistance = distanceCurrent;
