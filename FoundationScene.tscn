@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://7kfi1wxcbvgb" path="res://scripts/Foundation.cs" id="1_0fthl"]
 [ext_resource type="PackedScene" uid="uid://dv6cf8p3p804w" path="res://CollisionPolygonScene.tscn" id="2_0fthl"]
-[ext_resource type="Texture2D" uid="uid://0rpwd6phff53" path="res://cardAssets/FoundationHighlight.png" id="2_fipee"]
+[ext_resource type="Texture2D" uid="uid://c75waathruokc" path="res://cardAssets/CardHighlight.png" id="2_fipee"]
 
 [node name="Node2D" type="Area2D" unique_id=1027293535]
 collision_layer = 0

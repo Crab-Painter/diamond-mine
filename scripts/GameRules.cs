@@ -143,7 +143,7 @@ public static class GameRules
 			int valueDelta = cardToDropOn.value - draggedCard.value;
 			if (draggedCard.IsDiamonds())
 			{
-				return valueDelta == -1 || valueDelta == 12;
+				return cardToDropOn.IsDiamonds() && (valueDelta == -1 || valueDelta == 12);
 			}
 			else
 			{

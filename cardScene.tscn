@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://do31vfnbsjn74"]
 
 [ext_resource type="Script" uid="uid://dvwjvedbnjqdq" path="res://scripts/Card.cs" id="1_64stc"]
-[ext_resource type="Texture2D" uid="uid://bdah378akpwa2" path="res://cardAssets/12-4.png" id="2_6gg5k"]
 [ext_resource type="PackedScene" uid="uid://dv6cf8p3p804w" path="res://CollisionPolygonScene.tscn" id="2_8vm5s"]
 [ext_resource type="Texture2D" uid="uid://c75waathruokc" path="res://cardAssets/CardHighlight.png" id="2_gp0i2"]
 
@@ -13,7 +12,6 @@ pathToSprite = "./CardImage"
 pathToHighlighter = "./Highlighter"
 
 [node name="CardImage" type="Sprite2D" parent="." unique_id=231876022]
-texture = ExtResource("2_6gg5k")
 
 [node name="Highlighter" type="Sprite2D" parent="." unique_id=244588985]
 visible = false
