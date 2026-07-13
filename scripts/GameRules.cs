@@ -137,7 +137,7 @@ public static class GameRules
 
 	public static bool CanDrop(Card draggedCard, Area2D nodeToDropOn)
 	{
-		GD.Print("CanDropStart");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "CanDropStart");
 		if (nodeToDropOn is Card cardToDropOn)
 		{
 			int valueDelta = cardToDropOn.value - draggedCard.value;
@@ -151,9 +151,8 @@ public static class GameRules
 			}
 		}
 		
-		GD.Print("draggedCard.IsDiamonds() " + draggedCard.IsDiamonds().ToString());
-		GD.Print("nodeToDropOn.Name == \"DiamondFoundation\" " + (nodeToDropOn.Name == "DiamondFoundation").ToString());
-
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "draggedCard.IsDiamonds() " + draggedCard.IsDiamonds().ToString());
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "nodeToDropOn.Name == \"DiamondFoundation\" " + (nodeToDropOn.Name == "DiamondFoundation").ToString());
 		
 		return draggedCard.IsDiamonds() == (nodeToDropOn.Name == "DiamondFoundation");
 	}
@@ -161,58 +160,58 @@ public static class GameRules
 	//Updates point with assumption that card drag-n-drop was successfull
 	public static uint CalculatePointsChange(Card draggedCard)
 	{
-		GD.Print("CalculatePointsChange");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "CalculatePointsChange");
 		if (draggedCard.IsDiamonds())
 		{
 			return (uint)draggedCard.value;
 		}
 
-		GD.Print("Not Diamonds");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "Not Diamonds");
 		//check full suit pile
 		if (CollectedFullSuits[draggedCard.suit])
 		{
-			GD.Print("Already collected");
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "Already collected");
 			return 0;
 		}
 		// going up the tree
-		GD.Print("Going up");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "Going up");
 		Card cardPointer = draggedCard;
 		while(cardPointer.HasPreviousCard())
 		{
 			Card previousCard = cardPointer.GetPreviousCard();
 			if (previousCard.suit != cardPointer.suit || (previousCard.value - cardPointer.value != 1))
 			{
-				GD.Print("Not in order or wrong suit");
+				Logger.GetLogger().Log(Logger.LogTypes.debug, "Not in order or wrong suit");
 				return 0;
 			}
 			cardPointer = previousCard;
-			GD.Print("Current new value is " + cardPointer.value.ToString());
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "Current new value is " + cardPointer.value.ToString());
 		}
-		GD.Print("ended while loop");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "ended while loop");
 		if (cardPointer.value != 13)
 		{
-			GD.Print("foundation card is not a King");
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "foundation card is not a King");
 			return 0;
 		}
 
 		//going dowh the tree
-		GD.Print("going dowh");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "going dowh");
 		cardPointer = draggedCard;
 		while(cardPointer.HasNextCard())
 		{
 			Card nexrCard = cardPointer.GetNextCard();
 			if (nexrCard.suit != cardPointer.suit || (cardPointer.value - nexrCard.value != 1))
 			{
-				GD.Print("Not in order or wrong suit");
+				Logger.GetLogger().Log(Logger.LogTypes.debug, "Not in order or wrong suit");
 				return 0;
 			}
 			cardPointer = nexrCard;
-			GD.Print("Current new value is " + cardPointer.value.ToString());
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "Current new value is " + cardPointer.value.ToString());
 		}
-		GD.Print("ended while loop");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "ended while loop");
 		if (cardPointer.value != 1)
 		{
-			GD.Print("last card is not an Ace");
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "last card is not an Ace");
 			return 0;
 		}
 

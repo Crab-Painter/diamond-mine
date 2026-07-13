@@ -85,10 +85,10 @@ public partial class GameManager : Node2D
 	{
 		if (@event.IsActionPressed(DragActionName))
 		{
-			GD.Print("Drag pressed");
+			Logger.GetLogger().Log(Logger.LogTypes.buttons, "Drag pressed");
 			if (IsDoubleClick())
 			{
-				GD.Print("Double click registered");
+				Logger.GetLogger().Log(Logger.LogTypes.buttons, "Double click registered");
 				AutoDiamond();
 				return;
 			}
@@ -97,7 +97,7 @@ public partial class GameManager : Node2D
 
 		if (@event.IsActionReleased(DragActionName))
 		{
-			GD.Print("Drag released");
+			Logger.GetLogger().Log(Logger.LogTypes.buttons, "Drag released");
 			if (state != States.cardDragged)
 			{
 				return;
@@ -120,7 +120,7 @@ public partial class GameManager : Node2D
 
 		if (@event.IsActionPressed(DebugProbeActionName))
 		{
-			GD.Print("Debug pressed");
+			Logger.GetLogger().Log(Logger.LogTypes.buttons, "Debug pressed");
 			GetDebugInfoAtCursor();
 		}
 
@@ -169,9 +169,9 @@ public partial class GameManager : Node2D
 
 		//change gamestate
 		bool hasPreviousCard = cardNode.HasPreviousCard();
-		GD.Print("hasPreviousCard: " + hasPreviousCard);
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "hasPreviousCard: " + hasPreviousCard);
 		bool wasParentClosed = hasPreviousCard && cardNode.GetPreviousCard().isClosed;
-		GD.Print("wasParentClosed: " + wasParentClosed);
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "wasParentClosed: " + wasParentClosed);
 
 		draggedCardData = new(
 			cardNode,
@@ -180,7 +180,8 @@ public partial class GameManager : Node2D
 			cardNode.ZIndex,
 			wasParentClosed
 		);
-		GD.Print(draggedCardData.ToString());
+		Logger.GetLogger().Log(Logger.LogTypes.debug, draggedCardData.ToString());
+
 		state = States.cardDragged;
 		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
 		cardNode.SetZIndexRecursive(DragedCardZIndex);
@@ -245,7 +246,7 @@ public partial class GameManager : Node2D
 			if (area is IHighlightable highlightable)
 			{
 				highlightedAreas.Add(highlightable);
-				GD.Print("highlight count " + highlightedAreas.Count);
+				Logger.GetLogger().Log(Logger.LogTypes.debug, "highlight count " + highlightedAreas.Count);
 			}
 		}
 	}
@@ -303,7 +304,7 @@ public partial class GameManager : Node2D
 		{
 			arrStr += b.Key.ToString() + ": " + b.Value.ToString() + ", ";
 		}
-		GD.Print("backupCollectedFullSuits " + arrStr);
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "backupCollectedFullSuits " + arrStr);
 		undoRedo.CreateAction("drag card");
 		undoRedo.AddDoMethod(Callable.From(() => DropHere(dropPoint, draggedCardDataLocal)));
 		undoRedo.AddUndoMethod(Callable.From(() => ReverseDropHere(dropPoint, draggedCardDataLocal, backupCollectedFullSuits)));
@@ -406,7 +407,7 @@ public partial class GameManager : Node2D
 		{
 			arrStr += b.Key.ToString() + ": " + b.Value.ToString() + ", ";
 		}
-		GD.Print("backupCollectedFullSuits " + arrStr);
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "backupCollectedFullSuits " + arrStr);
 		GameRules.CollectedFullSuits = backupCollectedFullSuits.ToDictionary(el=>el.Key, el=>el.Value);
 	}
 
@@ -421,26 +422,26 @@ public partial class GameManager : Node2D
 
 	public void Undo()
 	{
-		GD.Print("Executing undo");
+		Logger.GetLogger().Log(Logger.LogTypes.buttons, "Executing undo");
 		undoRedo.Undo();
 	}
 
 	public void Redo()
 	{
-		GD.Print("Executing redo");
+		Logger.GetLogger().Log(Logger.LogTypes.buttons, "Executing redo");
 		undoRedo.Redo();
 	}
 
 	private void StartNewGamePressed()
 	{
-		GD.Print("New game pressed");
+		Logger.GetLogger().Log(Logger.LogTypes.buttons, "New game pressed");
 		bool isWin = state == States.win;
 		StatisticsData.EndGame(Points, isWin);
 		StartNewGame(isWin);
 	}
 	private void StartNewGame(bool isWin)
 	{
-		GD.Print("Starting new game");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "Starting new game");
 		GameRules.StartNewGame(this);
 		Points = 0;
 		undoRedo = new();
@@ -459,7 +460,7 @@ public partial class GameManager : Node2D
 		Godot.Collections.Array<Godot.Collections.Dictionary> matches = spaceState.IntersectPoint(queryParams);
 		if (matches.Count == 0)
 		{
-			GD.Print("No collision founded");
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "No collision founded");
 			return;
 		}
 
@@ -467,12 +468,12 @@ public partial class GameManager : Node2D
 		//get the top card (highest absolute Z index)
 		try
 		{
-			GD.Print("try cast Area2D");
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "try cast Area2D");
 			intersectNode = (Area2D)(GodotObject)matches[0]["collider"];
 		}
 		catch
 		{
-			GD.Print("not a card");
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "not a card");
 			return;
 		}
 		
@@ -487,7 +488,7 @@ public partial class GameManager : Node2D
 			}
 		}
 
-		GD.Print("found some node, start collecting log");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "found some node, start collecting log");
 		Node currentNode = intersectNode;
 		string pattern = @"Foundation";
 		Regex r = new(pattern);
@@ -507,8 +508,7 @@ public partial class GameManager : Node2D
 			log += "EXCEPTION WHILE COLLECTING LOG";
 		}
 
-
-		GD.Print(log);
+		Logger.GetLogger().Log(Logger.LogTypes.debug, log);
 	}
 
 	private bool IsDoubleClick()
@@ -524,7 +524,7 @@ public partial class GameManager : Node2D
 	}
 	private void AutoDiamond()
 	{
-		GD.Print("Start AutoDiamond");
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "Start AutoDiamond");
 		//check which areas2D associated with cards are in the point on mouse cursor
 		var spaceState = GetWorld2D().DirectSpaceState;
 		PhysicsPointQueryParameters2D queryParams = new();
@@ -534,7 +534,7 @@ public partial class GameManager : Node2D
 		Godot.Collections.Array<Godot.Collections.Dictionary> matches = spaceState.IntersectPoint(queryParams);
 		if (matches.Count == 0)
 		{
-			GD.Print("No intersection found");
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "No intersection found");
 			return;
 		}
 
