@@ -69,11 +69,15 @@ public partial class StatisticsData : Resource
         Godot.Collections.Dictionary<string, Variant> parsedContent = (Godot.Collections.Dictionary<string, Variant>)Json.ParseString(content);
         if (parsedContent != null)
         {
-            foreach (FieldInfo field in typeof(StatisticsData).GetFields())
+            foreach (FieldInfo field in typeof(StatisticsData).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
             {
                 try
                 {
-                    field.SetValue(null, (uint)parsedContent[field.Name]);
+                    if (parsedContent.TryGetValue(field.Name, out Variant value))
+                    {
+                        field.SetValue(null, (uint)value);
+                    }
+                    
                 }
                 catch (Exception e)
                 {
