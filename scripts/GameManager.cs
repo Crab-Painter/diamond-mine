@@ -49,8 +49,8 @@ public partial class GameManager : Node2D
 	{
 		UserInterface.RedoButton.Pressed += Redo;
 		UserInterface.UndoButton.Pressed += Undo;
-		UserInterface.NewGameButton.Pressed += StartNewGame;
-		StatisticsData.Load();	
+		UserInterface.NewGameButton.Pressed += StartNewGamePressed;
+		StatisticsData.Load();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -136,7 +136,7 @@ public partial class GameManager : Node2D
 
 		if (@event.IsActionPressed(NewGameActionName))
 		{
-			StartNewGame();
+			StartNewGamePressed();
 		}
 	}
 
@@ -412,12 +412,12 @@ public partial class GameManager : Node2D
 
 	private float GetPositionYAfterDrop(Area2D dropPoint)
 	{
-        if ((dropPoint is Card dropCard) && !dropCard.IsDiamonds())
-        {
-            return CardStackingTransform;
-        }
+		if ((dropPoint is Card dropCard) && !dropCard.IsDiamonds())
+		{
+			return CardStackingTransform;
+		}
 		return 0f;
-    }
+	}
 
 	public void Undo()
 	{
@@ -431,7 +431,14 @@ public partial class GameManager : Node2D
 		undoRedo.Redo();
 	}
 
-	private void StartNewGame()
+	private void StartNewGamePressed()
+	{
+		GD.Print("New game pressed");
+		bool isWin = state == States.win;
+		StatisticsData.EndGame(Points, isWin);
+		StartNewGame(isWin);
+	}
+	private void StartNewGame(bool isWin)
 	{
 		GD.Print("Starting new game");
 		GameRules.StartNewGame(this);

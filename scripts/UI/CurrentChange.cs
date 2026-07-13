@@ -6,6 +6,6 @@ public partial class CurrentChange : Label
 {
 	public void Update(uint points)
     {
-        Text = (new StatisticsData()).GetChange(points).ToString("f2");
+        Text = StatisticsData.GetAverageChange(points).ToString("f2");
     }
 }

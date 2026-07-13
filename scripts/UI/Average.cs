@@ -7,6 +7,6 @@ public partial class Average : Label
 
 	public void Update()
     {
-        Text = BaseText + (new StatisticsData()).GetAverage().ToString("f2");
+        Text = BaseText + StatisticsData.GetAverage().ToString("f2");
     }
 }

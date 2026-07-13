@@ -10,7 +10,7 @@ public partial class ChangeArrow : TextureRect
 	[Export] public string arrowDownPath;
     public void Update(uint points)
     {
-		int sign = Math.Sign((new StatisticsData()).GetChange(points));
+		int sign = Math.Sign(StatisticsData.GetAverageChange(points));
 		switch (sign)
 		{
 			case 1:
