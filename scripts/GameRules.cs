@@ -62,7 +62,7 @@ public static class GameRules
 			}
 			
 
-			Foundation foundation = rootNode.GetNode<Foundation>("Foundation"+foundationId);
+			Foundation foundation = rootNode.GetNode<Foundation>(rootNode.PathToFoundations + "Foundation"+foundationId);
 			foundation.furtestCard.AddChild(card);
 			card.Position = new Vector2(0,foundation.furtestCard is Card ? rootNode.CardStackingTransform : 0f);
 			foundation.furtestCard = card;

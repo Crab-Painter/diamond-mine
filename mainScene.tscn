@@ -11,6 +11,8 @@
 [ext_resource type="Texture2D" uid="uid://b6ylg2pmc4s4r" path="res://assets/redoIcon.png" id="6_vuu3o"]
 [ext_resource type="Script" uid="uid://bn6b36qx4onyk" path="res://scripts/UI/CurrentChange.cs" id="7_ykwv5"]
 [ext_resource type="Script" uid="uid://b88j5uuy5jto" path="res://scripts/UI/Average.cs" id="8_nlk40"]
+[ext_resource type="PackedScene" uid="uid://dlt57k01tuka7" path="res://menuScene.tscn" id="12_u7har"]
+[ext_resource type="Texture2D" uid="uid://bf1er2wwuukde" path="res://assets/menuBack.png" id="13_uqts1"]
 
 [node name="Main" type="Node2D" unique_id=835333600 node_paths=PackedStringArray("UserInterface", "DiamondFoundation", "DoubleClickTimer")]
 script = ExtResource("1_14l1l")
@@ -23,8 +25,9 @@ DebugProbeActionName = "Debug"
 UndoActionName = "Undo"
 RedoActionName = "Redo"
 NewGameActionName = "New Game"
-DiamondFoundation = NodePath("DiamondFoundation")
-DoubleClickTimer = NodePath("DoubleClickTimer")
+DiamondFoundation = NodePath("PlayingField/Foundations/DiamondFoundation")
+DoubleClickTimer = NodePath("PlayingField/DoubleClickTimer")
+PathToFoundations = "./PlayingField/Foundations/"
 
 [node name="UI" type="Control" parent="." unique_id=1466179020 node_paths=PackedStringArray("UndoButton", "RedoButton", "NewGameButton", "PlayerMessage", "PointsCounter", "ChangeArrow", "CurrentChange", "Average")]
 layout_mode = 3
@@ -48,6 +51,10 @@ offset_bottom = 40.0
 
 [node name="ButtonsContainer" type="HBoxContainer" parent="UI/Controls container" unique_id=1779258191]
 layout_mode = 2
+
+[node name="Button" type="Button" parent="UI/Controls container/ButtonsContainer" unique_id=897249232]
+layout_mode = 2
+text = "Menu"
 
 [node name="Undo" type="Button" parent="UI/Controls container/ButtonsContainer" unique_id=898314714]
 custom_minimum_size = Vector2(40, 40)
@@ -101,56 +108,70 @@ layout_mode = 2
 script = ExtResource("8_nlk40")
 BaseText = "Average: "
 
-[node name="Background" type="Sprite2D" parent="." unique_id=164644663]
+[node name="PlayingField" type="Node2D" parent="." unique_id=1565613964]
+
+[node name="Background" type="Sprite2D" parent="PlayingField" unique_id=164644663]
 z_index = -1
 z_as_relative = false
 position = Vector2(320, 180)
 texture = ExtResource("1_iwpey")
 
-[node name="Foundation1" parent="." unique_id=1027293535 instance=ExtResource("4_61od6")]
+[node name="Foundations" type="Node2D" parent="PlayingField" unique_id=181428249]
+
+[node name="Foundation1" parent="PlayingField/Foundations" unique_id=1027293535 instance=ExtResource("4_61od6")]
 position = Vector2(26, 114)
 
-[node name="Foundation2" parent="." unique_id=274586626 instance=ExtResource("4_61od6")]
+[node name="Foundation2" parent="PlayingField/Foundations" unique_id=274586626 instance=ExtResource("4_61od6")]
 position = Vector2(75, 114)
 
-[node name="Foundation3" parent="." unique_id=2090025646 instance=ExtResource("4_61od6")]
+[node name="Foundation3" parent="PlayingField/Foundations" unique_id=2090025646 instance=ExtResource("4_61od6")]
 position = Vector2(124, 114)
 
-[node name="Foundation4" parent="." unique_id=1149214531 instance=ExtResource("4_61od6")]
+[node name="Foundation4" parent="PlayingField/Foundations" unique_id=1149214531 instance=ExtResource("4_61od6")]
 position = Vector2(173, 114)
 
-[node name="Foundation5" parent="." unique_id=1313745637 instance=ExtResource("4_61od6")]
+[node name="Foundation5" parent="PlayingField/Foundations" unique_id=1313745637 instance=ExtResource("4_61od6")]
 position = Vector2(222, 114)
 
-[node name="Foundation6" parent="." unique_id=1974903667 instance=ExtResource("4_61od6")]
+[node name="Foundation6" parent="PlayingField/Foundations" unique_id=1974903667 instance=ExtResource("4_61od6")]
 position = Vector2(271, 114)
 
-[node name="Foundation7" parent="." unique_id=500922360 instance=ExtResource("4_61od6")]
+[node name="Foundation7" parent="PlayingField/Foundations" unique_id=500922360 instance=ExtResource("4_61od6")]
 position = Vector2(320, 114)
 
-[node name="Foundation8" parent="." unique_id=814129639 instance=ExtResource("4_61od6")]
+[node name="Foundation8" parent="PlayingField/Foundations" unique_id=814129639 instance=ExtResource("4_61od6")]
 position = Vector2(369, 114)
 
-[node name="Foundation9" parent="." unique_id=1412397906 instance=ExtResource("4_61od6")]
+[node name="Foundation9" parent="PlayingField/Foundations" unique_id=1412397906 instance=ExtResource("4_61od6")]
 position = Vector2(418, 114)
 
-[node name="Foundation10" parent="." unique_id=1959195950 instance=ExtResource("4_61od6")]
+[node name="Foundation10" parent="PlayingField/Foundations" unique_id=1959195950 instance=ExtResource("4_61od6")]
 position = Vector2(467, 114)
 
-[node name="Foundation11" parent="." unique_id=1133101757 instance=ExtResource("4_61od6")]
+[node name="Foundation11" parent="PlayingField/Foundations" unique_id=1133101757 instance=ExtResource("4_61od6")]
 position = Vector2(516, 114)
 
-[node name="Foundation12" parent="." unique_id=1216167385 instance=ExtResource("4_61od6")]
+[node name="Foundation12" parent="PlayingField/Foundations" unique_id=1216167385 instance=ExtResource("4_61od6")]
 position = Vector2(565, 114)
 
-[node name="Foundation13" parent="." unique_id=887504082 instance=ExtResource("4_61od6")]
+[node name="Foundation13" parent="PlayingField/Foundations" unique_id=887504082 instance=ExtResource("4_61od6")]
 position = Vector2(614, 114)
 
-[node name="DiamondFoundation" parent="." unique_id=1084824046 instance=ExtResource("4_61od6")]
+[node name="DiamondFoundation" parent="PlayingField/Foundations" unique_id=1084824046 instance=ExtResource("4_61od6")]
 position = Vector2(320, 38)
 collision_layer = 2
 
-[node name="DoubleClickTimer" type="Timer" parent="." unique_id=58959802]
+[node name="DoubleClickTimer" type="Timer" parent="PlayingField" unique_id=58959802]
 wait_time = 0.2
 one_shot = true
 ignore_time_scale = true
+
+[node name="Menu" parent="." unique_id=1978824149 instance=ExtResource("12_u7har")]
+visible = false
+z_index = 999
+
+[node name="TextureRect" type="TextureRect" parent="Menu" unique_id=1512901879]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("13_uqts1")

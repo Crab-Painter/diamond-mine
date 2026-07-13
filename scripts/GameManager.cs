@@ -17,6 +17,8 @@ public partial class GameManager : Node2D
 	[Export] public string NewGameActionName {get;set;}
 	[Export] public Foundation DiamondFoundation {get;set;}
 	[Export] public Timer DoubleClickTimer {get;set;}
+	[Export] public string PathToFoundations {get;set;}
+
 
 	private DraggedCardData draggedCardData;
 	private enum States
