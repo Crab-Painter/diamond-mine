@@ -77,14 +77,17 @@ public partial class StatisticsData : Resource
                 }
                 catch (Exception e)
                 {
-                    throw new System.Exception("error while trying to write "+field.Name+" property: "+e.Message);
+                    var msg = "error while trying to write "+field.Name+" property: "+e.Message;
+			        Logger.GetLogger().Log(Logger.LogTypes.exception, msg);
+                    throw new Exception(msg);
                 }
                 parsedContent.Remove(field.Name);
             }
-            
-            foreach ((string key, Variant value) in parsedContent)
+
+
+            foreach ((string key, _) in parsedContent)
             {
-                GD.Print("Error: unused field "+key+" in a save file");
+			    Logger.GetLogger().Log(Logger.LogTypes.error, "unused field "+key+" in a save file");
             }           
         }
 
