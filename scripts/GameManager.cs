@@ -50,7 +50,6 @@ public partial class GameManager : Node2D
 		UserInterface.RedoButton.Pressed += Redo;
 		UserInterface.UndoButton.Pressed += Undo;
 		UserInterface.NewGameButton.Pressed += StartNewGamePressed;
-		StatisticsData.Load();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -553,13 +552,13 @@ public partial class GameManager : Node2D
 		
 		if (!cardNode.IsDiamonds())
 		{
-			GD.Print("Detected card is not a Diamond");
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "Detected card is not a Diamond");
 			return;
 		}
 
 		if (GameRules.CanDrop(cardNode, DiamondFoundation.furtestCard))
 		{
-			GD.Print("Can AutoDiamond, starting");
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "Can AutoDiamond, starting");
 			bool wasParentClosed = cardNode.HasPreviousCard() && cardNode.GetPreviousCard().isClosed;
 			DraggedCardData draggedCardDataLocal = new(
 			cardNode,
