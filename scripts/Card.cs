@@ -39,7 +39,8 @@ public partial class Card : Area2D, IHighlightable
 
 	public void SetZIndexRecursive(int zId)
 	{
-		GD.Print(Name + " " + value.ToString() + " of " + ((GameRules.Suits)suit).ToString() + ". Z index is " + zId.ToString());
+		var msg = Name + " " + value.ToString() + " of " + ((GameRules.Suits)suit).ToString() + ". Z index is " + zId.ToString();
+		Logger.GetLogger().Log(Logger.LogTypes.debug,msg);
 		ZIndex = zId;
 		if (HasNode("./Card"))
 		{
