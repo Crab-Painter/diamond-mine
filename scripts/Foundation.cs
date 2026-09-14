@@ -4,7 +4,7 @@ namespace Diamondmine.scripts;
 
 public partial class Foundation : Area2D, IHighlightable
 {
-	[Export] public string pathToHighlighter;
+	[Export] public Sprite2D Highlighter;
 	public Area2D furtestCard;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -22,12 +22,10 @@ public partial class Foundation : Area2D, IHighlightable
 
 	public void HighlightOn()
 	{
-		var highlighter = (Sprite2D)GetNode(pathToHighlighter);
-		highlighter.Visible = true;
+		Highlighter.Visible = true;
 	}
 	public void HighlightOff()
 	{
-		var highlighter = (Sprite2D)GetNode(pathToHighlighter);
-		highlighter.Visible = false;
+		Highlighter.Visible = false;
 	}
 }

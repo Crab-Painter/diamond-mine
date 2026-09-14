@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://buxq1o6rvvwwa"]
+
+[ext_resource type="Script" uid="uid://dmy2xthr2gcyk" path="res://scripts/ui/UIManager.cs" id="1_xrght"]
+[ext_resource type="Texture2D" uid="uid://cmso85rgeisfu" path="res://assets/undoIcon.png" id="2_1nn7u"]
+[ext_resource type="Texture2D" uid="uid://b6ylg2pmc4s4r" path="res://assets/redoIcon.png" id="3_mpy3x"]
+[ext_resource type="Script" uid="uid://cgmausfi6gdjn" path="res://scripts/ui/PointsCounter.cs" id="4_y0htt"]
+[ext_resource type="Script" uid="uid://17gxdfvthb4p" path="res://scripts/ui/ChangeArrow.cs" id="5_xrght"]
+[ext_resource type="Script" uid="uid://bn6b36qx4onyk" path="res://scripts/ui/CurrentChange.cs" id="6_xrght"]
+[ext_resource type="Script" uid="uid://b88j5uuy5jto" path="res://scripts/ui/Average.cs" id="7_y0htt"]
+
+[node name="UI" type="Control" unique_id=1856552635 node_paths=PackedStringArray("MenuButton", "UndoButton", "RedoButton", "NewGameButton", "PlayerMessage", "PointsCounter", "ChangeArrow", "CurrentChange", "Average")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 640.0
+offset_bottom = 360.0
+script = ExtResource("1_xrght")
+MenuButton = NodePath("Controls container/ButtonsContainer/Menu")
+UndoButton = NodePath("Controls container/ButtonsContainer/Undo")
+RedoButton = NodePath("Controls container/ButtonsContainer/Redo")
+NewGameButton = NodePath("Controls container/ButtonsContainer/NewGame")
+PlayerMessage = NodePath("Controls container/Message")
+PointsCounter = NodePath("Statistics container/PointsCounter")
+ChangeArrow = NodePath("Statistics container/Change arrow")
+CurrentChange = NodePath("Statistics container/Current change")
+Average = NodePath("Statistics container/Average")
+
+[node name="Controls container" type="VBoxContainer" parent="." unique_id=1840844332]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="Controls container" unique_id=477988197]
+layout_mode = 2
+
+[node name="Menu" type="Button" parent="Controls container/ButtonsContainer" unique_id=578408896]
+layout_mode = 2
+text = "Menu"
+
+[node name="Undo" type="Button" parent="Controls container/ButtonsContainer" unique_id=1575702087]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+icon = ExtResource("2_1nn7u")
+expand_icon = true
+
+[node name="Redo" type="Button" parent="Controls container/ButtonsContainer" unique_id=2096816585]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+icon = ExtResource("3_mpy3x")
+expand_icon = true
+
+[node name="NewGame" type="Button" parent="Controls container/ButtonsContainer" unique_id=647702317]
+layout_mode = 2
+text = "New Game"
+
+[node name="Message" type="Label" parent="Controls container" unique_id=1444909154]
+layout_mode = 2
+
+[node name="Statistics container" type="HBoxContainer" parent="." unique_id=576677438]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_bottom = 40.0
+grow_horizontal = 0
+
+[node name="PointsCounter" type="Label" parent="Statistics container" unique_id=902656685]
+custom_minimum_size = Vector2(90, 20)
+layout_mode = 2
+script = ExtResource("4_y0htt")
+BaseText = "Points: "
+
+[node name="Change arrow" type="TextureRect" parent="Statistics container" unique_id=1480658933]
+custom_minimum_size = Vector2(8, 40)
+layout_mode = 2
+expand_mode = 1
+script = ExtResource("5_xrght")
+arrowUpPath = "res://assets/upArrow.png"
+arrowDownPath = "res://assets/downArrow.png"
+
+[node name="Current change" type="Label" parent="Statistics container" unique_id=952693498]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+script = ExtResource("6_xrght")
+
+[node name="Average" type="Label" parent="Statistics container" unique_id=246674449]
+layout_mode = 2
+script = ExtResource("7_y0htt")
+BaseText = "Average: "

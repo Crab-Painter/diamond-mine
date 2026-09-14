@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Diamondmine.scripts.menu;
+using System.Linq;
 
 namespace Diamondmine.scripts;
 
@@ -24,7 +26,7 @@ public static class GameRules
 		{(int)Suits.spades, false}
 	};
 
-    public static void GenerateDeck(GameManager rootNode, PackedScene cardScene)
+    public static void GenerateDeck(Game gameNode, PackedScene cardScene)
 	{
 		int[] deckIds = new int[52];
 		for (int i=0;i<52;i++)
@@ -40,13 +42,15 @@ public static class GameRules
 			int value = i%13+1;
 			int suit = i/13+1;
 			
-			string textureName = zId == 4 ? "res://cardAssets/"+value+"-"+suit+".png" : "res://cardAssets/CardBack.png";
-			Texture2D texture = (Texture2D)ResourceLoader.Load(textureName);
+			
 			Card card = (Card)cardScene.Instantiate();
+			string cardAssetsDir = SettingsData.CardAssetsDir;
+			string textureName = zId == 4 ? cardAssetsDir+value+"-"+suit+".png" : cardAssetsDir+"CardBack.png";
+			Texture2D texture = (Texture2D)ResourceLoader.Load(textureName);
+			card.SetCardImage(texture);
 			card.value = value;
 			card.suit = suit;
 			card.Name = "Card";
-			card.SetCardImage(texture);
 			card.ZIndex = zId;
 			card.isClosed = true;
 			card.CollisionLayer = 0;
@@ -62,9 +66,9 @@ public static class GameRules
 			}
 			
 
-			Foundation foundation = rootNode.GetNode<Foundation>(rootNode.PathToFoundations + "Foundation"+foundationId);
+			Foundation foundation = gameNode.PlayingField.GetFoundationNode(foundationId);
 			foundation.furtestCard.AddChild(card);
-			card.Position = new Vector2(0,foundation.furtestCard is Card ? rootNode.CardStackingTransform : 0f);
+			card.Position = new Vector2(0,foundation.furtestCard is Card ? gameNode.CardStackingTransform : 0f);
 			foundation.furtestCard = card;
 
 			foundationId++;
@@ -76,9 +80,9 @@ public static class GameRules
 		}		
 	}
 
-	public static void StartNewGame(GameManager rootNode)
+	public static void StartNewGame(Game gameNode)
 	{
-		ClearBoardFromCards(rootNode);
+		ClearBoardFromCards(gameNode);
 		CollectedFullSuits = new()
 		{
 			{(int)Suits.hearts, false},
@@ -87,7 +91,7 @@ public static class GameRules
 		};
 	}
 
-	private static void ClearBoardFromCards(GameManager rootNode)
+	private static void ClearBoardFromCards(Game gameNode)
 	{
 		for (int i=1;i<=13;i++)
 		{
@@ -95,42 +99,22 @@ public static class GameRules
 		}
 
 		bool includeChildrenOfChildren = false;//it's false by default, but i leave this here for clearance, because i already had this question
-		var rootChildren = rootNode.GetChildren(includeChildrenOfChildren);
-		string pattern = @"^Foundation\d+$";
-		Regex r = new(pattern);
-		foreach (Node rootChild in rootChildren)
+		var allFoundations = gameNode.PlayingField.FoundationsNode.GetChildren(includeChildrenOfChildren).Cast<Foundation>();
+		foreach (Foundation foundation in allFoundations)
 		{
-			if (r.IsMatch(rootChild.Name))
+			var children = foundation.GetChildren();
+			foreach (Node child in children)
 			{
-				Foundation foundation = (Foundation)rootChild;
-				var children = foundation.GetChildren();
-				foreach (Node child in children)
+				if (child.Name == "Card")
 				{
-					if (child.Name == "Card")
-					{
-						child.QueueFree();
-					}
+					child.QueueFree();
 				}
-				foundation.furtestCard = foundation;
-				foundation.CollisionLayer = 0;
 			}
-
-// comment for now to catch the reason of the bug first, not just mask its followups
-			// if (rootChild.Name == "Card")
-			// {
-			// 	rootChild.QueueFree();
-			// }
+			foundation.furtestCard = foundation;
+			foundation.CollisionLayer = 0;
 		}
 
-		Foundation diamondFoundation = rootNode.GetNode<Foundation>("DiamondFoundation");
-		var diamondChildren = diamondFoundation.GetChildren();
-		foreach (Node child in diamondChildren)
-		{
-			if (child.Name == "Card")
-			{
-				child.QueueFree();
-			}
-		}
+		Foundation diamondFoundation = gameNode.PlayingField.DiamondFoundation;
 		diamondFoundation.CollisionLayer = COLLISION_LAYER_DROPPABLE;
 		diamondFoundation.furtestCard = diamondFoundation;
 	}

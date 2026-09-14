@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bpkcio0ou5qgl"]
+
+[ext_resource type="Script" uid="uid://o5ijf2upjebm" path="res://scripts/Game.cs" id="1_18ig4"]
+[ext_resource type="PackedScene" uid="uid://buxq1o6rvvwwa" path="res://scenes/UIScene.tscn" id="1_k77ap"]
+[ext_resource type="PackedScene" uid="uid://do31vfnbsjn74" path="res://scenes/cardScene.tscn" id="2_7s5hy"]
+[ext_resource type="PackedScene" uid="uid://70bijdllsc0t" path="res://scenes/PlayingFieldScene.tscn" id="2_haeiw"]
+
+[node name="Game" type="Node2D" unique_id=160708974 node_paths=PackedStringArray("UserInterface", "PlayingField")]
+script = ExtResource("1_18ig4")
+CardScene = ExtResource("2_7s5hy")
+UserInterface = NodePath("UI")
+PlayingField = NodePath("PlayingField")
+DragedCardZIndex = 99
+CardStackingTransform = 17.0
+DragActionName = "LMB"
+DebugProbeActionName = "Debug"
+UndoActionName = "Undo"
+RedoActionName = "Redo"
+NewGameActionName = "New Game"
+PathToFoundations = "./PlayingField/Foundations/"
+
+[node name="UI" parent="." unique_id=1856552635 instance=ExtResource("1_k77ap")]
+
+[node name="PlayingField" parent="." unique_id=1856595367 instance=ExtResource("2_haeiw")]

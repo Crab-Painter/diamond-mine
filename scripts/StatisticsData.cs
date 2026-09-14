@@ -5,10 +5,10 @@ using Godot;
 namespace Diamondmine.scripts;
 public partial class StatisticsData : Resource
 {
-    private static uint games;
-    private static uint wins;
-    private static uint loses;
-    private static uint totalPoints;
+    private static uint games = 0;
+    private static uint wins = 0;
+    private static uint loses = 0;
+    private static uint totalPoints = 0;
 
     private static readonly string saveLocation = "res://Stats.txt";//TODO chage for release and make it customisable through godot
 
@@ -55,10 +55,6 @@ public partial class StatisticsData : Resource
         if (!FileAccess.FileExists(saveLocation))
         {
             //make new save and quit;
-            games = 0;
-            wins = 0;
-            loses = 0;
-            totalPoints = 0;
             Save();
             return;
         }
@@ -81,7 +77,7 @@ public partial class StatisticsData : Resource
                 }
                 catch (Exception e)
                 {
-                    var msg = "error while trying to write "+field.Name+" property: "+e.Message;
+                    var msg = "error while trying to write "+field.Name+" property in a stats file: "+e.Message;
 			        Logger.GetLogger().Log(Logger.LogTypes.exception, msg);
                     throw new Exception(msg);
                 }
@@ -91,7 +87,7 @@ public partial class StatisticsData : Resource
 
             foreach ((string key, _) in parsedContent)
             {
-			    Logger.GetLogger().Log(Logger.LogTypes.error, "unused field "+key+" in a save file");
+			    Logger.GetLogger().Log(Logger.LogTypes.error, "unused field "+key+" in a stats save file");
             }           
         }
 

@@ -1,0 +1,580 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Godot;
+
+namespace Diamondmine.scripts;
+public partial class Game : Node2D
+{
+	[Export] public PackedScene CardScene {get;set;}
+	[Export] public ui.UIManager UserInterface {get;set;}
+	[Export] public PlayingField PlayingField {get;set;}
+	[Export] public int DragedCardZIndex {get;set;}
+	[Export] public float CardStackingTransform {get;set;}
+	[Export] public string DragActionName {get;set;}
+	[Export] public string DebugProbeActionName {get;set;}
+	[Export] public string UndoActionName {get;set;}
+	[Export] public string RedoActionName {get;set;}
+	[Export] public string NewGameActionName {get;set;}
+
+
+	private DraggedCardData draggedCardData;
+	private enum States
+	{
+		idle,
+		cardDragged,
+		newGame,
+		win,
+		lose
+	}
+	private States state = States.newGame;
+	private uint _points = 0;
+	public uint Points
+	{
+		get
+		{
+			return _points;
+		}
+		set
+		{
+			_points = value;	
+			UserInterface.UpdatePoints(Points);
+		}
+	}
+	private UndoRedo undoRedo = new();
+	private readonly List<IHighlightable> highlightedAreas = [];
+	
+	// Called when the node enters the scene tree for the first time.
+	public override void _Ready()
+	{
+		UserInterface.RedoButton.Pressed += Redo;
+		UserInterface.UndoButton.Pressed += Undo;
+		UserInterface.NewGameButton.Pressed += StartNewGamePressed;
+	}
+
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _Process(double delta)
+	{
+		switch(state)
+		{
+			//switch to state pattern? doesn't seems like super heavy and complicated yet
+			case States.idle:
+				return;
+			case States.newGame:
+				UserInterface.PlayerMessage.Text = "";
+				GameRules.GenerateDeck(this, CardScene);
+				state = States.idle;
+				break;
+			case States.win:
+				UserInterface.PlayerMessage.Text = "You win!";//todo make preatier
+				break;
+			case States.lose:
+				//show "no possible moves" msg
+				break;
+			case States.cardDragged:
+				DragProcessing();
+				HighlightProcessing();
+				break;
+		}
+
+		// Godot.Logger logger = new();
+	}
+
+	public override void _Input(InputEvent @event)
+	{
+		if (@event.IsActionPressed(DragActionName))
+		{
+			Logger.GetLogger().Log(Logger.LogTypes.buttons, "Drag pressed");
+			if (IsDoubleClick())
+			{
+				Logger.GetLogger().Log(Logger.LogTypes.buttons, "Double click registered");
+				AutoDiamond();
+				return;
+			}
+			StartDrag();
+		}                  
+
+		if (@event.IsActionReleased(DragActionName))
+		{
+			Logger.GetLogger().Log(Logger.LogTypes.buttons, "Drag released");
+			if (state != States.cardDragged)
+			{
+				return;
+			}
+			state = States.idle;
+			Card draggedCardNode = draggedCardData.CardNode;
+
+			if (!TryDropHere())
+			{
+				draggedCardNode.Reparent(draggedCardData.CrardParentNode, false);
+				draggedCardNode.Position = new Vector2(0,draggedCardData.CrardParentNode is Card ? CardStackingTransform : 0f);
+				draggedCardNode.SetZIndexRecursive(draggedCardData.CardZIndexGlobal);
+			}
+
+			draggedCardNode.Monitoring = false;//disable enteres/exited signals
+			draggedCardNode.AreaEntered -= DropHighlightOn;
+			draggedCardNode.AreaExited -= DropHighlightOff;
+			ResetHighlight();
+		}
+
+		if (@event.IsActionPressed(DebugProbeActionName))
+		{
+			Logger.GetLogger().Log(Logger.LogTypes.buttons, "Debug pressed");
+			GetDebugInfoAtCursor();
+		}
+
+		if (@event.IsActionPressed(UndoActionName))
+		{
+			Undo();
+		}
+
+		if (@event.IsActionPressed(RedoActionName))
+		{
+			Redo();
+		}
+
+		if (@event.IsActionPressed(NewGameActionName))
+		{
+			StartNewGamePressed();
+		}
+	}
+
+	private void StartDrag()
+	{
+		//check which areas2D associated with cards are in the point on mouse cursor
+		var spaceState = GetWorld2D().DirectSpaceState;
+		PhysicsPointQueryParameters2D queryParams = new();
+		queryParams.SetPosition(GetGlobalMousePosition());
+		queryParams.SetCollideWithAreas(true);
+		queryParams.SetCollisionMask(GameRules.COLLISION_LAYER_DRAGGABLE);
+		Godot.Collections.Array<Godot.Collections.Dictionary> matches = spaceState.IntersectPoint(queryParams);
+		if (matches.Count == 0)
+		{
+			return;
+		}
+
+		//get the top card (highest absolute Z index)
+		Card cardNode = (Card)(GodotObject)matches[0]["collider"];
+		int maxZId = cardNode.ZIndex;
+		foreach (Godot.Collections.Dictionary match in matches)
+		{
+			Card collisionNode = (Card)(GodotObject)match["collider"];
+			if (collisionNode.ZIndex > maxZId)
+			{
+				maxZId = collisionNode.ZIndex;
+				cardNode = collisionNode;
+			}
+		}
+
+		//change gamestate
+		bool hasPreviousCard = cardNode.HasPreviousCard();
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "hasPreviousCard: " + hasPreviousCard);
+		bool wasParentClosed = hasPreviousCard && cardNode.GetPreviousCard().isClosed;
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "wasParentClosed: " + wasParentClosed);
+
+		draggedCardData = new(
+			cardNode,
+			cardNode.GetParent<Area2D>(),
+			cardNode.GlobalPosition - GetGlobalMousePosition(),
+			cardNode.ZIndex,
+			wasParentClosed
+		);
+		Logger.GetLogger().Log(Logger.LogTypes.debug, draggedCardData.ToString());
+
+		state = States.cardDragged;
+		cardNode.Reparent(this);//It's way easier to change (calculate changes as human) position of cards this way
+		cardNode.SetZIndexRecursive(DragedCardZIndex);
+
+		cardNode.Monitoring = true;//enable enteres/exited signals
+		cardNode.AreaEntered += DropHighlightOn;
+		cardNode.AreaExited += DropHighlightOff;
+	}
+
+	private void DragProcessing()
+	{
+		Vector2 mousePosition = GetGlobalMousePosition();
+		Card draggedCardNode = draggedCardData.CardNode;
+		draggedCardNode.Position = new Vector2(
+			float.Clamp(mousePosition.X, 0, GetViewportRect().Size.X),//looks like this might cause productivity drop?
+			float.Clamp(mousePosition.Y, 0, GetViewportRect().Size.Y)
+		) + draggedCardData.RelativeDragVector;
+	}
+	private void HighlightProcessing()
+	{
+		if (highlightedAreas.Count == 0)
+		{
+			return;
+		}
+		else if (highlightedAreas.Count == 1)
+		{
+			highlightedAreas[0].HighlightOn();
+		}
+		else
+		{
+			Area2D closestArea = (Area2D)highlightedAreas[0];
+			float minDistance = draggedCardData.CardNode.GlobalPosition.DistanceTo(closestArea.GlobalPosition);
+			foreach (Area2D area in highlightedAreas.Cast<Area2D>())
+			{
+				float distanceCurrent = draggedCardData.CardNode.GlobalPosition.DistanceTo(area.GlobalPosition);
+				if (distanceCurrent < minDistance)
+				{
+					minDistance = distanceCurrent;
+					closestArea = area;
+				}
+			}
+
+			foreach (IHighlightable area in highlightedAreas)
+			{
+				if (((Area2D)area).GetRid() == closestArea.GetRid())
+				{
+					area.HighlightOn();
+				}
+				else
+				{
+					area.HighlightOff();
+				}
+			}
+		}
+		
+	}
+
+	private void DropHighlightOn(Area2D area)
+	{
+		if (GameRules.CanDrop(draggedCardData.CardNode, area))
+		{
+			if (area is IHighlightable highlightable)
+			{
+				highlightedAreas.Add(highlightable);
+				Logger.GetLogger().Log(Logger.LogTypes.debug, "highlight count " + highlightedAreas.Count);
+			}
+		}
+	}
+
+	private void DropHighlightOff(Area2D area)
+	{
+		if (area is IHighlightable highlightable && highlightedAreas.Contains(highlightable))
+		{
+			highlightable.HighlightOff();
+			highlightedAreas.Remove(highlightable);
+		}
+	}
+	private void ResetHighlight()
+	{
+		foreach (IHighlightable area in highlightedAreas)
+		{
+			area.HighlightOff();
+		}
+		highlightedAreas.Clear();
+	}
+
+	private bool TryDropHere()
+	{
+		if (highlightedAreas.Count == 0)
+		{
+			return false;
+		}
+
+		Area2D dropPoint;
+		if (highlightedAreas.Count == 1)
+		{
+			dropPoint = (Area2D)highlightedAreas[0];
+		}
+		else
+		{
+			Area2D closestArea = (Area2D)highlightedAreas[0];
+			float minDistance = draggedCardData.CardNode.GlobalPosition.DistanceTo(closestArea.GlobalPosition);
+			foreach (Area2D area in highlightedAreas.Cast<Area2D>())
+			{
+				float distanceCurrent = draggedCardData.CardNode.GlobalPosition.DistanceTo(area.GlobalPosition);
+				if (distanceCurrent < minDistance)
+				{
+					minDistance = distanceCurrent;
+					closestArea = area;
+				}
+			}
+			dropPoint = closestArea;
+		}
+
+
+		DraggedCardData draggedCardDataLocal = draggedCardData;
+		Dictionary<int,bool> backupCollectedFullSuits = GameRules.CollectedFullSuits.ToDictionary(el=>el.Key, el=>el.Value);
+		string arrStr = "";
+		foreach (KeyValuePair<int,bool> b in backupCollectedFullSuits)
+		{
+			arrStr += b.Key.ToString() + ": " + b.Value.ToString() + ", ";
+		}
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "backupCollectedFullSuits " + arrStr);
+		undoRedo.CreateAction("drag card");
+		undoRedo.AddDoMethod(Callable.From(() => DropHere(dropPoint, draggedCardDataLocal)));
+		undoRedo.AddUndoMethod(Callable.From(() => ReverseDropHere(dropPoint, draggedCardDataLocal, backupCollectedFullSuits)));
+		undoRedo.AddUndoProperty(this, "Points", Points);
+		undoRedo.CommitAction();
+		return true;
+	}
+	
+	private void DropHere(Area2D dropPoint, DraggedCardData draggedCardDataLocal)
+	{
+		//Visuals and parenting
+		Card draggedCardNode = draggedCardDataLocal.CardNode;
+		draggedCardNode.Reparent(dropPoint, false);
+		draggedCardNode.Position = new Vector2(0,GetPositionYAfterDrop(dropPoint));
+		draggedCardNode.SetZIndexRecursive(dropPoint.ZIndex+1);
+
+		//drop point processing
+		dropPoint.CollisionLayer -= GameRules.COLLISION_LAYER_DROPPABLE;
+		if (dropPoint.Name == "DiamondFoundation")
+		{
+			PlayingField.DiamondFoundation.furtestCard = draggedCardNode;
+		}
+		else if (dropPoint.Name == "Card")
+		{
+			Card dropPointCard = (Card)dropPoint;
+			if (dropPointCard.IsDiamonds())
+			{
+				PlayingField.DiamondFoundation.furtestCard = draggedCardNode;
+			} 
+		}
+
+
+		//previous place processing
+		Area2D parent = draggedCardDataLocal.CrardParentNode;
+		parent.CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
+		if (parent is Card card && card.isClosed)
+		{
+			card.FlipFaceUp();
+		}
+
+		
+		//card processing
+		if (draggedCardNode.IsDiamonds())
+		{
+			draggedCardNode.CollisionLayer = GameRules.COLLISION_LAYER_DROPPABLE;
+		}
+
+		//game rules(win, lose, points ect) processing
+		Points += GameRules.CalculatePointsChange(draggedCardNode);
+		if (GameRules.IsWin(Points))
+		{
+			state = States.win;
+		}
+	}
+
+	private void ReverseDropHere(Area2D dropPoint, DraggedCardData draggedCardDataLocal, Dictionary<int,bool> backupCollectedFullSuits)
+	{
+		//Visuals and parenting
+		Card draggedCardNode = draggedCardDataLocal.CardNode;
+		Area2D parent = draggedCardDataLocal.CrardParentNode;
+		draggedCardNode.Reparent(parent, false);
+		draggedCardNode.Position = new Vector2(0,parent is Card ? CardStackingTransform : 0f);
+		draggedCardNode.SetZIndexRecursive(draggedCardDataLocal.CardZIndexGlobal);
+
+		//drop point processing
+		dropPoint.CollisionLayer += GameRules.COLLISION_LAYER_DROPPABLE;
+		if (dropPoint.Name == "DiamondFoundation")
+		{
+			PlayingField.DiamondFoundation.furtestCard = dropPoint;
+		}
+		else if (dropPoint.Name == "Card")
+		{
+			Card dropPointCard = (Card)dropPoint;
+			if (dropPointCard.IsDiamonds())
+			{
+				PlayingField.DiamondFoundation.furtestCard = dropPoint;
+			} 
+		}
+
+		//previous place processing
+		
+		if (parent is Card card && draggedCardDataLocal.WasParentClosed)
+		{
+			card.FlipFaceDown();
+		}
+		else
+		{
+			parent.CollisionLayer -= GameRules.COLLISION_LAYER_DROPPABLE;
+		}
+		
+		//card processing
+		if (draggedCardNode.IsDiamonds())
+		{
+			draggedCardNode.CollisionLayer = GameRules.COLLISION_LAYER_DRAGGABLE;
+		}
+
+		//game rules(win, lose, points ect) processing
+		string arrStr = "";
+		foreach (KeyValuePair<int,bool> b in backupCollectedFullSuits)
+		{
+			arrStr += b.Key.ToString() + ": " + b.Value.ToString() + ", ";
+		}
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "backupCollectedFullSuits " + arrStr);
+		GameRules.CollectedFullSuits = backupCollectedFullSuits.ToDictionary(el=>el.Key, el=>el.Value);
+	}
+
+	private float GetPositionYAfterDrop(Area2D dropPoint)
+	{
+		if ((dropPoint is Card dropCard) && !dropCard.IsDiamonds())
+		{
+			return CardStackingTransform;
+		}
+		return 0f;
+	}
+
+	public void Undo()
+	{
+		Logger.GetLogger().Log(Logger.LogTypes.buttons, "Executing undo");
+		undoRedo.Undo();
+	}
+
+	public void Redo()
+	{
+		Logger.GetLogger().Log(Logger.LogTypes.buttons, "Executing redo");
+		undoRedo.Redo();
+	}
+
+	private void StartNewGamePressed()
+	{
+		Logger.GetLogger().Log(Logger.LogTypes.buttons, "New game pressed");
+		bool isWin = state == States.win;
+		StatisticsData.EndGame(Points, isWin);
+		StartNewGame(isWin);
+	}
+	private void StartNewGame(bool isWin)
+	{
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "Starting new game");
+		GameRules.StartNewGame(this);
+		Points = 0;
+		undoRedo = new();
+		state = States.newGame;
+	}
+
+
+	private void GetDebugInfoAtCursor()
+	{
+		//check which areas2D associated with cards are in the point on mouse cursor
+		var spaceState = GetWorld2D().DirectSpaceState;
+		PhysicsPointQueryParameters2D queryParams = new();
+		queryParams.SetPosition(GetGlobalMousePosition());
+		queryParams.SetCollideWithAreas(true);
+		// queryParams.SetCollisionMask(GameRules.COLLISION_LAYER_DRAGGABLE);
+		Godot.Collections.Array<Godot.Collections.Dictionary> matches = spaceState.IntersectPoint(queryParams);
+		if (matches.Count == 0)
+		{
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "No collision founded");
+			return;
+		}
+
+		Area2D intersectNode;
+		//get the top card (highest absolute Z index)
+		try
+		{
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "try cast Area2D");
+			intersectNode = (Area2D)(GodotObject)matches[0]["collider"];
+		}
+		catch
+		{
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "not a card");
+			return;
+		}
+		
+		int maxZId = intersectNode.ZIndex;
+		foreach (Godot.Collections.Dictionary match in matches)
+		{
+			Area2D collisionNode = (Area2D)(GodotObject)match["collider"];
+			if (collisionNode.ZIndex > maxZId)
+			{
+				maxZId = collisionNode.ZIndex;
+				intersectNode = collisionNode;
+			}
+		}
+
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "found some node, start collecting log");
+		Node currentNode = intersectNode;
+		string pattern = @"Foundation";
+		Regex r = new(pattern);
+		string log = currentNode.Name + " ";
+		try
+		{
+			log += currentNode.ToString();
+			while (!r.IsMatch(currentNode.Name) || currentNode.Name == Name)
+			{
+				Node parent = currentNode.GetParent();
+				currentNode = parent;
+				log += ". -> " + currentNode.Name + " " + currentNode.ToString();
+			}
+		}
+		catch
+		{
+			log += "EXCEPTION WHILE COLLECTING LOG";
+		}
+
+		Logger.GetLogger().Log(Logger.LogTypes.debug, log);
+	}
+
+	private bool IsDoubleClick()
+	{
+		if (!PlayingField.DoubleClickTimer.IsStopped())
+		{
+			PlayingField.DoubleClickTimer.Stop();
+			return true;
+		}
+		PlayingField.DoubleClickTimer.Start();
+		return false;
+		
+	}
+	private void AutoDiamond()
+	{
+		Logger.GetLogger().Log(Logger.LogTypes.debug, "Start AutoDiamond");
+		//check which areas2D associated with cards are in the point on mouse cursor
+		var spaceState = GetWorld2D().DirectSpaceState;
+		PhysicsPointQueryParameters2D queryParams = new();
+		queryParams.SetPosition(GetGlobalMousePosition());
+		queryParams.SetCollideWithAreas(true);
+		queryParams.SetCollisionMask(GameRules.COLLISION_LAYER_DRAGGABLE);
+		Godot.Collections.Array<Godot.Collections.Dictionary> matches = spaceState.IntersectPoint(queryParams);
+		if (matches.Count == 0)
+		{
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "No intersection found");
+			return;
+		}
+
+		//get the top card (highest absolute Z index)
+		Card cardNode = (Card)(GodotObject)matches[0]["collider"];
+		int maxZId = cardNode.ZIndex;
+		foreach (Godot.Collections.Dictionary match in matches)
+		{
+			Card collisionNode = (Card)(GodotObject)match["collider"];
+			if (collisionNode.ZIndex > maxZId)
+			{
+				maxZId = collisionNode.ZIndex;
+				cardNode = collisionNode;
+			}
+		}
+		
+		if (!cardNode.IsDiamonds())
+		{
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "Detected card is not a Diamond");
+			return;
+		}
+
+		if (GameRules.CanDrop(cardNode, PlayingField.DiamondFoundation.furtestCard))
+		{
+			Logger.GetLogger().Log(Logger.LogTypes.debug, "Can AutoDiamond, starting");
+			bool wasParentClosed = cardNode.HasPreviousCard() && cardNode.GetPreviousCard().isClosed;
+			DraggedCardData draggedCardDataLocal = new(
+			cardNode,
+			cardNode.GetParent<Area2D>(),
+			cardNode.GlobalPosition - GetGlobalMousePosition(),
+			cardNode.ZIndex,
+			wasParentClosed
+			);
+
+			Area2D dropPoint = PlayingField.DiamondFoundation.furtestCard;
+			Dictionary<int,bool> backupCollectedFullSuits = GameRules.CollectedFullSuits.ToDictionary(el=>el.Key, el=>el.Value);
+			undoRedo.CreateAction("auto diamond");
+			undoRedo.AddDoMethod(Callable.From(() => DropHere(dropPoint, draggedCardDataLocal)));
+			undoRedo.AddUndoMethod(Callable.From(() => ReverseDropHere(dropPoint, draggedCardDataLocal, backupCollectedFullSuits)));
+			undoRedo.AddUndoProperty(this, "Points", Points);
+			undoRedo.CommitAction();
+		}	
+	}
+}

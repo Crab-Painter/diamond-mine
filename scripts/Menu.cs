@@ -2,10 +2,9 @@ using Godot;
 using System;
 
 namespace Diamondmine.scripts;
-public partial class GameManager : Node
+
+public partial class Menu : Control
 {
-	[Export] public Game GameScene {get;set;}
-	[Export] public Menu MenuScene {get;set;}
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{

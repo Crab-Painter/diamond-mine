@@ -1,11 +1,12 @@
+using Diamondmine.scripts.menu;
 using Godot;
 
 namespace Diamondmine.scripts;
 
 public partial class Card : Area2D, IHighlightable
 {
-	[Export] public string pathToSprite;
-	[Export] public string pathToHighlighter;
+	[Export] public Sprite2D Image;
+	[Export] public Sprite2D Highlighter;
 
 	public int value;
 	public int suit;
@@ -20,21 +21,9 @@ public partial class Card : Area2D, IHighlightable
         return base.ToString() + result;
     }
 
-
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
-
 	public void SetCardImage(Texture2D texture)
 	{
-		var sprite = (Sprite2D)GetNode(pathToSprite);
-		sprite.Texture = texture;
+		Image.Texture = texture;
 	}
 
 	public void SetZIndexRecursive(int zId)
@@ -56,7 +45,7 @@ public partial class Card : Area2D, IHighlightable
 			return;
 		}
 
-		Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/"+value+"-"+suit+".png");
+		Texture2D texture = (Texture2D)ResourceLoader.Load(SettingsData.CardAssetsDir+value+"-"+suit+".png");
 		SetCardImage(texture);
 		CollisionLayer = GameRules.COLLISION_LAYER_DRAGGABLE;
 		if (!IsDiamonds())
@@ -73,7 +62,7 @@ public partial class Card : Area2D, IHighlightable
 			return;
 		}
 
-		Texture2D texture = (Texture2D)ResourceLoader.Load("res://cardAssets/CardBack.png");
+		Texture2D texture = (Texture2D)ResourceLoader.Load(SettingsData.CardAssetsDir+"CardBack.png");
 		SetCardImage(texture);
 		CollisionLayer = 0;
 		isClosed = true;
@@ -110,12 +99,10 @@ public partial class Card : Area2D, IHighlightable
 
 	public void HighlightOn()
 	{
-		var highlighter = (Sprite2D)GetNode(pathToHighlighter);
-		highlighter.Visible = true;
+		Highlighter.Visible = true;
 	}
 	public void HighlightOff()
 	{
-		var highlighter = (Sprite2D)GetNode(pathToHighlighter);
-		highlighter.Visible = false;
+		Highlighter.Visible = false;
 	}
 }

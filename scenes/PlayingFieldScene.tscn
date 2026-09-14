@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://70bijdllsc0t"]
+
+[ext_resource type="Texture2D" uid="uid://btp0bhhh2kv68" path="res://assets/back.png" id="1_6en56"]
+[ext_resource type="Script" uid="uid://cxbmjqqekpvxp" path="res://scripts/PlayingField.cs" id="1_c8ulv"]
+[ext_resource type="PackedScene" uid="uid://b0deu5nx81f20" path="res://scenes/FoundationScene.tscn" id="2_c8ulv"]
+
+[node name="PlayingField" type="Node2D" unique_id=1856595367 node_paths=PackedStringArray("DiamondFoundation", "DoubleClickTimer", "FoundationsNode")]
+script = ExtResource("1_c8ulv")
+DiamondFoundation = NodePath("Foundations/DiamondFoundation")
+DoubleClickTimer = NodePath("DoubleClickTimer")
+FoundationsNode = NodePath("Foundations")
+
+[node name="Background" type="Sprite2D" parent="." unique_id=303663713]
+z_index = -1
+z_as_relative = false
+position = Vector2(320, 180)
+texture = ExtResource("1_6en56")
+
+[node name="Foundations" type="Node2D" parent="." unique_id=234232998]
+
+[node name="Foundation1" parent="Foundations" unique_id=1027293535 instance=ExtResource("2_c8ulv")]
+position = Vector2(26, 114)
+
+[node name="Foundation2" parent="Foundations" unique_id=1770156753 instance=ExtResource("2_c8ulv")]
+position = Vector2(75, 114)
+
+[node name="Foundation3" parent="Foundations" unique_id=173113473 instance=ExtResource("2_c8ulv")]
+position = Vector2(124, 114)
+
+[node name="Foundation4" parent="Foundations" unique_id=969210473 instance=ExtResource("2_c8ulv")]
+position = Vector2(173, 114)
+
+[node name="Foundation5" parent="Foundations" unique_id=1046289746 instance=ExtResource("2_c8ulv")]
+position = Vector2(222, 114)
+
+[node name="Foundation6" parent="Foundations" unique_id=389338051 instance=ExtResource("2_c8ulv")]
+position = Vector2(271, 114)
+
+[node name="Foundation7" parent="Foundations" unique_id=2143798644 instance=ExtResource("2_c8ulv")]
+position = Vector2(320, 114)
+
+[node name="Foundation8" parent="Foundations" unique_id=1646625100 instance=ExtResource("2_c8ulv")]
+position = Vector2(369, 114)
+
+[node name="Foundation9" parent="Foundations" unique_id=1991237999 instance=ExtResource("2_c8ulv")]
+position = Vector2(418, 114)
+
+[node name="Foundation10" parent="Foundations" unique_id=1467716369 instance=ExtResource("2_c8ulv")]
+position = Vector2(467, 114)
+
+[node name="Foundation11" parent="Foundations" unique_id=187004953 instance=ExtResource("2_c8ulv")]
+position = Vector2(516, 114)
+
+[node name="Foundation12" parent="Foundations" unique_id=1430297717 instance=ExtResource("2_c8ulv")]
+position = Vector2(565, 114)
+
+[node name="Foundation13" parent="Foundations" unique_id=854650292 instance=ExtResource("2_c8ulv")]
+position = Vector2(614, 114)
+
+[node name="DiamondFoundation" parent="Foundations" unique_id=134150692 instance=ExtResource("2_c8ulv")]
+position = Vector2(320, 38)
+collision_layer = 2
+
+[node name="DoubleClickTimer" type="Timer" parent="." unique_id=1255764734]
+wait_time = 0.2
+one_shot = true
+ignore_time_scale = true
