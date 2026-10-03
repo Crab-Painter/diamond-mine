@@ -2,14 +2,14 @@
 
 [ext_resource type="Script" uid="uid://dcsitdp76f6tt" path="res://scripts/GameManager.cs" id="1_8ifl6"]
 [ext_resource type="PackedScene" uid="uid://bpkcio0ou5qgl" path="res://scenes/GameScene.tscn" id="3_twn0q"]
-[ext_resource type="PackedScene" uid="uid://dlt57k01tuka7" path="res://scenes/menuScene.tscn" id="4_hhxvm"]
+[ext_resource type="PackedScene" uid="uid://kmty8uior5uh" path="res://scenes/menuScene.tscn" id="4_hhxvm"]
 
 [node name="Main" type="Node" unique_id=1232565410 node_paths=PackedStringArray("GameScene", "MenuScene")]
 script = ExtResource("1_8ifl6")
 GameScene = NodePath("Game")
 MenuScene = NodePath("Menu")
+MenuActionName = "Menu Toggle"
 
 [node name="Game" parent="." unique_id=160708974 instance=ExtResource("3_twn0q")]
 
 [node name="Menu" parent="." unique_id=1978824149 instance=ExtResource("4_hhxvm")]
-visible = false
