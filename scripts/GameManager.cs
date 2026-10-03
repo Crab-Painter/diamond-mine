@@ -17,6 +17,8 @@ public partial class GameManager : Node
 	{
 		RemoveChild(MenuScene);
 		EventManager.OpenSubMenuEvent += OpenSubMenu;
+		EventManager.MenuReturnRequestEvent += GoBackOneLevel;
+		EventManager.OpenMenuRequestEvent += OpenMenu;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bf1er2wwuukde" path="res://assets/menuBack.png" id="1_wcdjt"]
 [ext_resource type="Script" uid="uid://cpg67jwpwe07s" path="res://scripts/menu/ResolutionButton.cs" id="2_v8on6"]
+[ext_resource type="PackedScene" uid="uid://dto85mku036gr" path="res://scenes/returnButton.tscn" id="4_s1w5l"]
 [ext_resource type="Script" uid="uid://c6v4q5wfyrcho" path="res://scripts/menu/FullscreenButton.cs" id="4_yhruw"]
 
 [node name="Menu" type="Control" unique_id=1978824149]
@@ -62,14 +63,5 @@ text = "Fullscreen: "
 layout_mode = 2
 script = ExtResource("4_yhruw")
 
-[node name="ReturnButton" type="Button" parent="." unique_id=551740779]
+[node name="ReturnButton" parent="." unique_id=474216102 instance=ExtResource("4_s1w5l")]
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -41.0
-offset_right = 55.0
-offset_bottom = -10.0
-grow_vertical = 0
-text = "Return"

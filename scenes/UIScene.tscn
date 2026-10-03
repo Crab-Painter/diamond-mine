@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dmy2xthr2gcyk" path="res://scripts/ui/UIManager.cs" id="1_xrght"]
 [ext_resource type="Texture2D" uid="uid://cmso85rgeisfu" path="res://assets/undoIcon.png" id="2_1nn7u"]
+[ext_resource type="Script" uid="uid://c7bqihglfhe6f" path="res://scripts/menu/MenuButton.cs" id="2_y0htt"]
 [ext_resource type="Texture2D" uid="uid://b6ylg2pmc4s4r" path="res://assets/redoIcon.png" id="3_mpy3x"]
 [ext_resource type="Script" uid="uid://cgmausfi6gdjn" path="res://scripts/ui/PointsCounter.cs" id="4_y0htt"]
 [ext_resource type="Script" uid="uid://17gxdfvthb4p" path="res://scripts/ui/ChangeArrow.cs" id="5_xrght"]
@@ -35,6 +36,7 @@ layout_mode = 2
 [node name="Menu" type="Button" parent="Controls container/ButtonsContainer" unique_id=578408896]
 layout_mode = 2
 text = "Menu"
+script = ExtResource("2_y0htt")
 
 [node name="Undo" type="Button" parent="Controls container/ButtonsContainer" unique_id=1575702087]
 custom_minimum_size = Vector2(40, 40)
