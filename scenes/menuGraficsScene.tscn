@@ -1,17 +1,19 @@
 [gd_scene format=3 uid="uid://dlt57k01tuka7"]
 
+[ext_resource type="Script" uid="uid://b0en6rrnmrm3p" path="res://scripts/menu/MenuGrafics.cs" id="1_1j2ns"]
 [ext_resource type="Texture2D" uid="uid://bf1er2wwuukde" path="res://assets/menuBack.png" id="1_wcdjt"]
-[ext_resource type="Script" uid="uid://cpg67jwpwe07s" path="res://scripts/menu/ResolutionButton.cs" id="2_v8on6"]
 [ext_resource type="PackedScene" uid="uid://dto85mku036gr" path="res://scenes/returnButton.tscn" id="4_s1w5l"]
-[ext_resource type="Script" uid="uid://c6v4q5wfyrcho" path="res://scripts/menu/FullscreenButton.cs" id="4_yhruw"]
 
-[node name="Menu" type="Control" unique_id=1978824149]
+[node name="Menu" type="Control" unique_id=1978824149 node_paths=PackedStringArray("ResolutionSelect", "Fullscreen")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_1j2ns")
+ResolutionSelect = NodePath("MenuButtons/ResolutionContainer/ResolutionSelect")
+Fullscreen = NodePath("MenuButtons/FullscreenContainer/FullscreenCheckbox")
 
 [node name="Background" type="TextureRect" parent="." unique_id=434609746]
 layout_mode = 0
@@ -50,7 +52,6 @@ popup/item_1/text = "1280x720"
 popup/item_1/id = 1
 popup/item_2/text = "1920x1080"
 popup/item_2/id = 2
-script = ExtResource("2_v8on6")
 
 [node name="FullscreenContainer" type="HBoxContainer" parent="MenuButtons" unique_id=823496627]
 layout_mode = 2
@@ -61,7 +62,6 @@ text = "Fullscreen: "
 
 [node name="FullscreenCheckbox" type="CheckBox" parent="MenuButtons/FullscreenContainer" unique_id=879855048]
 layout_mode = 2
-script = ExtResource("4_yhruw")
 
 [node name="ReturnButton" parent="." unique_id=474216102 instance=ExtResource("4_s1w5l")]
 layout_mode = 1

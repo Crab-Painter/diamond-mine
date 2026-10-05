@@ -5,7 +5,7 @@ using Godot;
 namespace Diamondmine.scripts.menu;
 public partial class SettingsData : Resource
 {
-    public static string Resolution = "";
+    public static string Resolution = "640x360";
     public static bool IsFullscreen = false;
     public static string CardAssetsDir = "res://assets/cardAssets/";
 
