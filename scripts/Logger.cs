@@ -9,7 +9,7 @@ public class Logger
 {
     private static Logger _logger;
 
-    private readonly string logsDir = "res://logs/";
+    private static readonly string logsDir = "res://logs/";
 
     public enum LogTypes
     {
@@ -37,6 +37,11 @@ public class Logger
     public static Logger GetLogger()
     {
         _logger ??= new Logger();
+
+        if (!DirAccess.DirExistsAbsolute(logsDir))
+        {
+            DirAccess.MakeDirAbsolute(logsDir);
+        }
 
         return _logger;
     }

@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 namespace Diamondmine.scripts.menu;
 
@@ -29,6 +28,7 @@ public partial class MenuGrafics : Control
 		SettingsData.IsFullscreen = Fullscreen.ButtonPressed;
 		var mode = Fullscreen.ButtonPressed ? Window.ModeEnum.Fullscreen : Window.ModeEnum.Windowed;
 		GetTree().GetRoot().GetWindow().SetMode(mode);
+		SettingsData.Save();
 	}
 
 	public void ChangeResolution(long index)
@@ -38,5 +38,6 @@ public partial class MenuGrafics : Control
         int width = dimensions[0].ToInt();
         int hight = dimensions[1].ToInt();
 		GetTree().GetRoot().GetWindow().SetSize(new Vector2I(width,hight));
+		SettingsData.Save();
 	}
 }
