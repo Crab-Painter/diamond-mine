@@ -2,4 +2,7 @@
 .godot/
 /android/
 Stats.txt
+Settings.txt
 /logs
+loggerLog.txt
+Logs*.txt

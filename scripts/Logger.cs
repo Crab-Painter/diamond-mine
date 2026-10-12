@@ -9,7 +9,7 @@ public class Logger
 {
     private static Logger _logger;
 
-    private static readonly string logsDir = "res://logs/";
+    private static readonly string logsDir = "res://";
 
     public enum LogTypes
     {
@@ -17,16 +17,20 @@ public class Logger
         debug,
         buttons,
         error,
-        exception
+        exception,
+        gameInit,
+        fileAccess
     }
 
     private readonly Dictionary<LogTypes, string> Map = new()
     {
-        {LogTypes.all, "AllLog.txt"},
-        {LogTypes.debug, "DebugLogs.txt"},
-        {LogTypes.buttons, "ButtonsLogs.txt"},
-        {LogTypes.error, "ErrorLogs.txt"},
-        {LogTypes.exception, "ExceptionLogs.txt"}
+        {LogTypes.all, "LogAll.txt"},
+        {LogTypes.debug, "LogsDebug.txt"},
+        {LogTypes.buttons, "LogsButtons.txt"},
+        {LogTypes.error, "LogsError.txt"},
+        {LogTypes.exception, "LogsException.txt"},
+        {LogTypes.gameInit, "LogsGameInit.txt"},
+        {LogTypes.fileAccess, "LogsFileAccess.txt"},
 
     };
     private Logger()
@@ -37,11 +41,6 @@ public class Logger
     public static Logger GetLogger()
     {
         _logger ??= new Logger();
-
-        if (!DirAccess.DirExistsAbsolute(logsDir))
-        {
-            DirAccess.MakeDirAbsolute(logsDir);
-        }
 
         return _logger;
     }

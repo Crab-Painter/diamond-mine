@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices.Swift;
 using Godot;
 
 namespace Diamondmine.scripts.menu;
@@ -17,9 +18,9 @@ public partial class SettingsData : Resource
 
         var saveData = new Godot.Collections.Dictionary<string, string>
         {
-            {"resolution", Resolution},
-            {"isFullscreen", IsFullscreen.ToString()},
-            {"cardAssetsDir", CardAssetsDir},
+            {"Resolution", Resolution},
+            {"IsFullscreen", IsFullscreen.ToString()},
+            {"CardAssetsDir", CardAssetsDir},
         };
         var jsonStr = Json.Stringify(saveData);
 
@@ -29,30 +30,46 @@ public partial class SettingsData : Resource
 
     public static void Load()
     {
+        Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "start Load SettingsData");
+
         if (!FileAccess.FileExists(saveLocation))
         {
+            Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "save file does not exists. Creating one and exit Load()");
             //make new save and quit;
             Save();
             return;
         }
 
         using var saveFile = FileAccess.Open(saveLocation, FileAccess.ModeFlags.Read);
+        if (saveFile == null)
+        {
+            Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "loaded file is null");
+        }
         string content = saveFile.GetAsText();
 
         Godot.Collections.Dictionary<string, Variant> parsedContent = (Godot.Collections.Dictionary<string, Variant>)Json.ParseString(content);
         if (parsedContent != null)
         {
-            foreach (FieldInfo field in typeof(SettingsData).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
+            Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "start reading parced content");
+            foreach (FieldInfo field in typeof(SettingsData).GetFields(BindingFlags.Public | BindingFlags.Static))
             {
+                Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "start field " + field.Name);
                 try
                 {
                     if (parsedContent.TryGetValue(field.Name, out Variant value))
                     {
+                        Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "value type is: " + field.FieldType.Name);
+                        Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "value is: " + value.ToString());
                         if (field.FieldType.Name == "Boolean")
                         {
-                            field.SetValue(null, Convert.ToBoolean(value));
+                            Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "set bool value");
+                            field.SetValue(null, Convert.ToBoolean(value.ToString()));
                         }
-                        field.SetValue(null, value);
+                        else if (field.FieldType.Name == "String")
+                        {
+                            Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "set string value");
+                            field.SetValue(null, value.ToString());
+                        }
                     }
                     
                 }
@@ -70,6 +87,10 @@ public partial class SettingsData : Resource
             {
 			    Logger.GetLogger().Log(Logger.LogTypes.error, "unused field "+key+" in a save file");
             }           
+        }
+        else
+        {
+            Logger.GetLogger().Log(Logger.LogTypes.fileAccess, "parced file is null");
         }
 
     }

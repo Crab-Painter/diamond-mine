@@ -24,7 +24,6 @@ public partial class MenuGrafics : Control
 
 	public void Toggle()
 	{
-		GD.Print("pressed");
 		SettingsData.IsFullscreen = Fullscreen.ButtonPressed;
 		var mode = Fullscreen.ButtonPressed ? Window.ModeEnum.Fullscreen : Window.ModeEnum.Windowed;
 		GetTree().GetRoot().GetWindow().SetMode(mode);

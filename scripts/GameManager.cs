@@ -1,3 +1,4 @@
+using Diamondmine.scripts.menu;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ public partial class GameManager : Node
 	[Export] public Menu MenuScene {get;set;}
 	[Export] public string MenuActionName {get;set;}
 
-	public List<Node> MenuPath = [];
+	private List<Node> MenuPath = [];
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -19,6 +20,24 @@ public partial class GameManager : Node
 		EventManager.OpenSubMenuEvent += OpenSubMenu;
 		EventManager.MenuReturnRequestEvent += GoBackOneLevel;
 		EventManager.OpenMenuRequestEvent += OpenMenu;
+
+		InitGraphics();
+	}
+
+	private void InitGraphics()
+	{
+		Logger.GetLogger().Log(Logger.LogTypes.gameInit, "InitGraphics");
+		SettingsData.Load();
+		
+		var mode = SettingsData.IsFullscreen ? Window.ModeEnum.Fullscreen : Window.ModeEnum.Windowed;
+		GetTree().GetRoot().GetWindow().SetMode(mode);
+		Logger.GetLogger().Log(Logger.LogTypes.gameInit, "screen mode: " + mode.ToString());
+
+		string[] dimensions = SettingsData.Resolution.Split("x");
+        int width = dimensions[0].ToInt();
+        int hight = dimensions[1].ToInt();
+		GetTree().GetRoot().GetWindow().SetSize(new Vector2I(width,hight));
+		Logger.GetLogger().Log(Logger.LogTypes.gameInit, "screen. width: " + width.ToString() + ", hight: " + hight.ToString());
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
