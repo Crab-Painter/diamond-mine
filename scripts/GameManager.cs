@@ -34,8 +34,8 @@ public partial class GameManager : Node
 		Logger.GetLogger().Log(Logger.LogTypes.gameInit, "screen mode: " + mode.ToString());
 
 		string[] dimensions = SettingsData.Resolution.Split("x");
-        int width = dimensions[0].ToInt();
-        int hight = dimensions[1].ToInt();
+		int width = dimensions[0].ToInt();
+		int hight = dimensions[1].ToInt();
 		GetTree().GetRoot().GetWindow().SetSize(new Vector2I(width,hight));
 		Logger.GetLogger().Log(Logger.LogTypes.gameInit, "screen. width: " + width.ToString() + ", hight: " + hight.ToString());
 	}
