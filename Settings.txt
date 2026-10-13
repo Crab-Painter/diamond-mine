@@ -1,1 +1,0 @@
-{"cardAssetsDir":"res://assets/cardAssets/","isFullscreen":"False","resolution":"1280x720"}

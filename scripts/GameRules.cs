@@ -54,6 +54,7 @@ public static class GameRules
 			card.ZIndex = zId;
 			card.isClosed = true;
 			card.CollisionLayer = 0;
+			card.AddToGroup(Game.CARDS_GROUP_NAME);
 
 			if (zId == 4)
 			{
@@ -93,23 +94,17 @@ public static class GameRules
 
 	private static void ClearBoardFromCards(Game gameNode)
 	{
-		for (int i=1;i<=13;i++)
+		var cards = gameNode.GetTree().GetNodesInGroup(Game.CARDS_GROUP_NAME);
+		foreach (Card card in cards.Cast<Card>())
 		{
-			
+			card.Reparent(gameNode);
+			gameNode.RemoveChild(card);
+			card.QueueFree();
 		}
 
-		bool includeChildrenOfChildren = false;//it's false by default, but i leave this here for clearance, because i already had this question
-		var allFoundations = gameNode.PlayingField.FoundationsNode.GetChildren(includeChildrenOfChildren).Cast<Foundation>();
-		foreach (Foundation foundation in allFoundations)
+		var foundations = gameNode.GetTree().GetNodesInGroup(Game.FOUNDATIONS_GROUP_NAME);
+		foreach (Foundation foundation in foundations.Cast<Foundation>())
 		{
-			var children = foundation.GetChildren();
-			foreach (Node child in children)
-			{
-				if (child.Name == "Card")
-				{
-					child.QueueFree();
-				}
-			}
 			foundation.furtestCard = foundation;
 			foundation.CollisionLayer = 0;
 		}

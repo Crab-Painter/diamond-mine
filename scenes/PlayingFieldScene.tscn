@@ -18,43 +18,43 @@ texture = ExtResource("1_6en56")
 
 [node name="Foundations" type="Node2D" parent="." unique_id=234232998]
 
-[node name="Foundation1" parent="Foundations" unique_id=1027293535 instance=ExtResource("2_c8ulv")]
+[node name="Foundation1" parent="Foundations" unique_id=1027293535 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(26, 114)
 
-[node name="Foundation2" parent="Foundations" unique_id=1770156753 instance=ExtResource("2_c8ulv")]
+[node name="Foundation2" parent="Foundations" unique_id=1770156753 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(75, 114)
 
-[node name="Foundation3" parent="Foundations" unique_id=173113473 instance=ExtResource("2_c8ulv")]
+[node name="Foundation3" parent="Foundations" unique_id=173113473 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(124, 114)
 
-[node name="Foundation4" parent="Foundations" unique_id=969210473 instance=ExtResource("2_c8ulv")]
+[node name="Foundation4" parent="Foundations" unique_id=969210473 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(173, 114)
 
-[node name="Foundation5" parent="Foundations" unique_id=1046289746 instance=ExtResource("2_c8ulv")]
+[node name="Foundation5" parent="Foundations" unique_id=1046289746 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(222, 114)
 
-[node name="Foundation6" parent="Foundations" unique_id=389338051 instance=ExtResource("2_c8ulv")]
+[node name="Foundation6" parent="Foundations" unique_id=389338051 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(271, 114)
 
-[node name="Foundation7" parent="Foundations" unique_id=2143798644 instance=ExtResource("2_c8ulv")]
+[node name="Foundation7" parent="Foundations" unique_id=2143798644 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(320, 114)
 
-[node name="Foundation8" parent="Foundations" unique_id=1646625100 instance=ExtResource("2_c8ulv")]
+[node name="Foundation8" parent="Foundations" unique_id=1646625100 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(369, 114)
 
-[node name="Foundation9" parent="Foundations" unique_id=1991237999 instance=ExtResource("2_c8ulv")]
+[node name="Foundation9" parent="Foundations" unique_id=1991237999 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(418, 114)
 
-[node name="Foundation10" parent="Foundations" unique_id=1467716369 instance=ExtResource("2_c8ulv")]
+[node name="Foundation10" parent="Foundations" unique_id=1467716369 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(467, 114)
 
-[node name="Foundation11" parent="Foundations" unique_id=187004953 instance=ExtResource("2_c8ulv")]
+[node name="Foundation11" parent="Foundations" unique_id=187004953 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(516, 114)
 
-[node name="Foundation12" parent="Foundations" unique_id=1430297717 instance=ExtResource("2_c8ulv")]
+[node name="Foundation12" parent="Foundations" unique_id=1430297717 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(565, 114)
 
-[node name="Foundation13" parent="Foundations" unique_id=854650292 instance=ExtResource("2_c8ulv")]
+[node name="Foundation13" parent="Foundations" unique_id=854650292 groups=["foundations"] instance=ExtResource("2_c8ulv")]
 position = Vector2(614, 114)
 
 [node name="DiamondFoundation" parent="Foundations" unique_id=134150692 instance=ExtResource("2_c8ulv")]

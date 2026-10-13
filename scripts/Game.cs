@@ -37,10 +37,12 @@ public partial class Game : Node2D
 		}
 		set
 		{
-			_points = value;	
+			_points = value;
 			UserInterface.UpdatePoints(Points);
 		}
 	}
+	public const string CARDS_GROUP_NAME = "cards";
+	public const string FOUNDATIONS_GROUP_NAME = "foundations";
 	private UndoRedo undoRedo = new();
 	private readonly List<IHighlightable> highlightedAreas = [];
 	
@@ -443,7 +445,7 @@ public partial class Game : Node2D
 		Logger.GetLogger().Log(Logger.LogTypes.debug, "Starting new game");
 		GameRules.StartNewGame(this);
 		Points = 0;
-		undoRedo = new();
+		undoRedo.ClearHistory();
 		state = States.newGame;
 	}
 
